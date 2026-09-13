@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Add versioned Supabase bridge to index.html
+      - name: Add versioned Supabase bridge after app code
         shell: bash
         run: |
           python3 - <<'PY'
@@ -23,9 +23,9 @@ jobs:
           p = Path('index.html')
           text = p.read_text(encoding='utf-8')
           text = re.sub(r'\s*<script\s+src=["\']supabase\.js(?:\?[^"\']*)?["\']\s*></script>\s*', '\n', text, count=1)
-          marker = '</head>'
+          marker = '</body>'
           if marker not in text:
-              raise SystemExit('Could not find </head> in index.html')
+              raise SystemExit('Could not find </body> in index.html')
           tag = '    <script src="supabase.js?v=auth2"></script>\n'
           text = text.replace(marker, tag + marker, 1)
           p.write_text(text, encoding='utf-8')
@@ -41,5 +41,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git commit -m 'Force fresh Supabase bridge in Pages'
+          git commit -m 'Load Supabase bridge after app code'
           git push
