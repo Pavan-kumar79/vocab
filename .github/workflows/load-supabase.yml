@@ -1,4 +1,4 @@
-name: Load Supabase bridge
+name: Load app support scripts
 
 on:
   push:
@@ -14,7 +14,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Add app support scripts after app code
+      - name: Add support scripts after app code
         shell: bash
         run: |
           python3 - <<'PY'
@@ -22,12 +22,14 @@ jobs:
           import re
           p = Path('index.html')
           text = p.read_text(encoding='utf-8')
-          text = re.sub(r'\s*<script\s+src=["\']supabase\.js(?:\?[^"\']*)?["\']\s*></script>\s*', '\n', text, count=1)
-          text = re.sub(r'\s*<script\s+src=["\']ocr-fix\.js(?:\?[^"\']*)?["\']\s*></script>\s*', '\n', text, count=1)
+          for name in ['supabase.js','ocr-fix.js','functional.js']:
+              text = re.sub(r'\s*<script\s+src=["\']' + re.escape(name) + r'(?:\?[^"\']*)?["\']\s*></script>\s*', '\n', text)
           marker = '</body>'
           if marker not in text:
               raise SystemExit('Could not find </body> in index.html')
-          tags = '    <script src="ocr-fix.js?v=1"></script>\n    <script src="supabase.js?v=auth2"></script>\n'
+          tags = ('    <script src="supabase.js?v=auth2"></script>\n'
+                  '    <script src="ocr-fix.js?v=2"></script>\n'
+                  '    <script src="functional.js?v=2"></script>\n')
           text = text.replace(marker, tags + marker, 1)
           p.write_text(text, encoding='utf-8')
           PY
@@ -40,7 +42,7 @@ jobs:
             exit 0
           fi
           git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git config user.email '41898282+users.noreply.github.com'
           git add index.html
-          git commit -m 'Load OCR fix without changing UI'
+          git commit -m 'Load functionality patches after cloud bridge'
           git push
