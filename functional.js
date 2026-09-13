@@ -314,10 +314,61 @@
     return {wordObj:target,type,typeLabel:label,promptText:prompt,correctAnswer:correct,options:opts};
   }
 
+  // Today's Words: add a mode without touching the working quiz engine.
+  // The existing startConfiguredQuiz() remains the only quiz engine.
+  function installTodayQuizMode() {
+    const select = document.getElementById('quiz-mode-select');
+    if (!select || select.querySelector('option[value="Today"]')) return;
+
+    const option = document.createElement('option');
+    option.value = 'Today';
+    option.textContent = "Today's Words";
+    select.appendChild(option);
+
+    const startButton = document.querySelector('button[onclick="startConfiguredQuiz()"]');
+    if (!startButton || startButton.dataset.todayQuizInstalled === '1') return;
+    startButton.dataset.todayQuizInstalled = '1';
+
+    startButton.addEventListener('click', () => {
+      if (select.value !== 'Today') return;
+
+      const bank = window.allWordsCache;
+      if (!Array.isArray(bank)) return;
+
+      const now = new Date();
+      const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const endOfToday = new Date(startOfToday);
+      endOfToday.setDate(endOfToday.getDate() + 1);
+
+      const todayWords = bank.filter(word => {
+        const added = new Date(word.dateAdded);
+        return !Number.isNaN(added.getTime()) && added >= startOfToday && added < endOfToday;
+      });
+
+      // Temporarily narrow the existing quiz engine's source array.
+      // It restores itself through refreshDataAndUI() after the quiz starts.
+      const originalWords = bank.slice();
+      bank.splice(0, bank.length, ...todayWords);
+
+      setTimeout(() => {
+        // If the quiz did not trigger a refresh (for example, no words today), restore it.
+        if (window.allWordsCache === bank) {
+          bank.splice(0, bank.length, ...originalWords);
+        }
+      }, 0);
+    }, true);
+  }
+
   // Keep existing renderer compatible with the new candidate fields.
   const oldRender = window.renderOcrCandidatesTable;
   if (oldRender) {
     // Existing renderer will read window.ocrCandidates, so no replacement needed.
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', installTodayQuizMode, { once: true });
+  } else {
+    installTodayQuizMode();
   }
 
   console.info('[Functional patch] loaded');
