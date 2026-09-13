@@ -1,0 +1,20 @@
+name: Final cleanup
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Remove stray literal newlines
+        run: python -c 'from pathlib import Path; p=Path("index.html"); s=p.read_text(encoding="utf-8"); s=s.replace("\\n<style id=\"ui-visibility-fix-v1\">","<style id=\"ui-visibility-fix-v1\">"); s=s.replace("</style>\\n<style id=\"main-home-button-fix-v2\">","</style>\n<style id=\"main-home-button-fix-v2\">"); s=s.replace("</style>\\n</head>","</style>\n</head>"); p.write_text(s,encoding="utf-8")'
+      - name: Commit cleanup
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Remove stray literal newline characters" || true
+          git push || true
