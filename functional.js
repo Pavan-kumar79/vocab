@@ -262,6 +262,7 @@
   function installAllPracticeModes() {
     const select = document.getElementById('quiz-mode-select');
     if (!select) return;
+    addMode(select, 'Today', 'Today');
     addMode(select, 'Last7', 'Last 7 Days');
     addMode(select, 'Last30', 'Last 30 Days');
     addMode(select, 'Older', 'Older Than 30 Days');
