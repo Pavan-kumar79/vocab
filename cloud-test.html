@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SSC Vocab Cloud Test</title>
+  <style>
+    body{font-family:Arial,sans-serif;max-width:760px;margin:40px auto;padding:20px;line-height:1.5;background:#f8fafc;color:#0f172a}
+    .card{background:white;border:1px solid #e2e8f0;border-radius:14px;padding:24px;box-shadow:0 4px 18px rgba(0,0,0,.06)}
+    .ok{color:#047857}.bad{color:#b91c1c}.muted{color:#64748b}
+    code{background:#f1f5f9;padding:2px 5px;border-radius:4px}
+    button{padding:10px 16px;border:0;border-radius:8px;background:#2563eb;color:white;font-weight:700;cursor:pointer}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>SSC Vocab — Cloud Database Test</h1>
+    <p class="muted">This page checks whether the live GitHub Pages site can read your Supabase <code>words</code> table.</p>
+    <div id="status">Checking...</div>
+    <p id="details"></p>
+    <button onclick="runTest()">Run Test Again</button>
+  </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL='https://mczrczsnjiruywkzpzny.supabase.co';
+const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1jenJjenNuamlydXl3a3pwem55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyNzc1NjAsImV4cCI6MjEwNDg1MzU2MH0.k_ONkmaI-PdWcSIhIJ6f1FQzOwrCM1lradC3vu9Ujrg';
+const client=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+async function runTest(){
+ const status=document.getElementById('status'); const details=document.getElementById('details');
+ status.className=''; status.textContent='Checking Supabase...'; details.textContent='';
+ const {data,error,count}=await client.from('words').select('word',{count:'exact',head:false}).limit(5);
+ if(error){ status.className='bad'; status.textContent='❌ Cloud connection/table test failed'; details.textContent='Error: '+error.message+' | Code: '+(error.code||'unknown'); return; }
+ status.className='ok'; status.textContent='✅ Supabase connection works';
+ details.textContent='The words table is readable. Current cloud word count: '+(count ?? data.length)+'. Sample rows returned: '+data.length+'.';
+}
+runTest();
+</script>
+</body>
+</html>
