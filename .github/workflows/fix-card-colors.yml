@@ -1,0 +1,30 @@
+name: Fix card color specificity
+on:
+  push:
+    paths:
+      - '.github/workflows/fix-card-colors.yml'
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Strengthen only six card color rules
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          old=''' .home-stat-total { color:#d6d6d6 !important; }\n.home-stat-untested { color:#60a5fa !important; }\n.home-stat-tested { color:#22c55e !important; }\n.home-stat-weak { color:#ef4444 !important; }\n.home-stat-revision { color:#a78bfa !important; }\n.home-stat-troublesome { color:#f59e0b !important; }'''.lstrip()
+          new='''#view-home .home-stat-total, #view-home .home-stat-total * { color:#d6d6d6 !important; }\n#view-home .home-stat-untested, #view-home .home-stat-untested * { color:#60a5fa !important; }\n#view-home .home-stat-tested, #view-home .home-stat-tested * { color:#22c55e !important; }\n#view-home .home-stat-weak, #view-home .home-stat-weak * { color:#ef4444 !important; }\n#view-home .home-stat-revision, #view-home .home-stat-revision * { color:#a78bfa !important; }\n#view-home .home-stat-troublesome, #view-home .home-stat-troublesome * { color:#f59e0b !important; }'''
+          if old not in s:
+              raise SystemExit('Expected card color rules not found; no change made.')
+          s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Fix semantic card color specificity"
+          git push
