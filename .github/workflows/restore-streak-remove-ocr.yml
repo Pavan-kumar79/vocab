@@ -1,0 +1,97 @@
+name: Restore streak and remove OCR buttons
+on:
+  push:
+    paths:
+      - '.github/workflows/restore-streak-remove-ocr.yml'
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update index
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+
+          # Remove only the visible OCR navigation/buttons; leave OCR internals untouched.
+          replacements = [
+          '''                    <button onclick="navigateTo('ocr-import')" id="nav-ocr" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 transition-all">\n                        <i class="fa-solid fa-camera"></i><span>Photo Import</span>\n                    </button>\n''',
+          '''            <button onclick="navigateTo('ocr-import'); toggleMobileMenu();" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-semibold flex items-center space-x-3 hover:bg-slate-100 dark:hover:bg-slate-700">\n                <i class="fa-solid fa-camera w-5 text-purple-600"></i><span>Blackbook Photo OCR</span>\n            </button>\n''',
+          '''                        <button onclick="navigateTo('ocr-import')" class="w-full sm:w-auto px-5 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-semibold rounded-xl transition flex items-center justify-center space-x-2 border border-white/20">\n                            <i class="fa-solid fa-camera"></i>\n                            <span>Scan Blackbook Page</span>\n                        </button>\n'''
+          ]
+          for old in replacements:
+              s = s.replace(old, '')
+
+          # Add a compact daily-streak badge to the existing header controls.
+          marker = '<!-- DAILY STREAK BADGE -->'
+          if marker not in s:
+              streak = r'''<!-- DAILY STREAK BADGE -->
+          <button id="daily-streak-button" type="button" title="Daily quiz streak" class="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+              <i class="fa-solid fa-fire"></i><span id="daily-streak-label">0 day streak</span>
+          </button>
+          '''
+              anchor = '                    <button onclick="toggleDarkMode()" title="Toggle Dark/Light Mode"'
+              s = s.replace(anchor, streak + anchor, 1)
+
+          # Restore streak tracking without touching quiz/database logic.
+          script_marker = '<!-- DAILY STREAK LOGIC -->'
+          if script_marker not in s:
+              script = r'''<!-- DAILY STREAK LOGIC -->
+          <script>
+          (function () {
+              const KEY = 'sscCglDailyStreak';
+              function today() { return new Date().toISOString().slice(0, 10); }
+              function previousDay(date) {
+                  const d = new Date(date + 'T00:00:00');
+                  d.setDate(d.getDate() - 1);
+                  return d.toISOString().slice(0, 10);
+              }
+              function getState() {
+                  try { return JSON.parse(localStorage.getItem(KEY)) || { streak: 0, lastDate: null }; }
+                  catch (_) { return { streak: 0, lastDate: null }; }
+              }
+              function render() {
+                  const el = document.getElementById('daily-streak-label');
+                  const btn = document.getElementById('daily-streak-button');
+                  if (!el || !btn) return;
+                  const state = getState();
+                  el.textContent = `${state.streak || 0} day streak`;
+                  btn.classList.remove('hidden');
+                  btn.classList.add('sm:flex');
+              }
+              function recordPractice() {
+                  const state = getState();
+                  const t = today();
+                  if (state.lastDate === t) { render(); return; }
+                  if (state.lastDate === previousDay(t)) state.streak = (state.streak || 0) + 1;
+                  else state.streak = 1;
+                  state.lastDate = t;
+                  localStorage.setItem(KEY, JSON.stringify(state));
+                  render();
+              }
+              document.addEventListener('click', function (e) {
+                  const b = e.target.closest('button');
+                  if (!b) return;
+                  const action = b.getAttribute('onclick') || '';
+                  if (/startQuickQuiz|startConfiguredQuiz/.test(action)) recordPractice();
+              }, true);
+              document.addEventListener('DOMContentLoaded', render);
+              render();
+          })();
+          </script>
+          '''
+              s = s.replace('</body>', script + '\n</body>', 1)
+
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Restore daily streak and remove OCR buttons"
+          git push
