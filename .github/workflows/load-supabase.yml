@@ -8,13 +8,13 @@ permissions:
   contents: write
 
 jobs:
-  inject-supabase-script:
+  inject-scripts:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Add versioned Supabase bridge after app code
+      - name: Add app support scripts after app code
         shell: bash
         run: |
           python3 - <<'PY'
@@ -23,11 +23,12 @@ jobs:
           p = Path('index.html')
           text = p.read_text(encoding='utf-8')
           text = re.sub(r'\s*<script\s+src=["\']supabase\.js(?:\?[^"\']*)?["\']\s*></script>\s*', '\n', text, count=1)
+          text = re.sub(r'\s*<script\s+src=["\']ocr-fix\.js(?:\?[^"\']*)?["\']\s*></script>\s*', '\n', text, count=1)
           marker = '</body>'
           if marker not in text:
               raise SystemExit('Could not find </body> in index.html')
-          tag = '    <script src="supabase.js?v=auth2"></script>\n'
-          text = text.replace(marker, tag + marker, 1)
+          tags = '    <script src="ocr-fix.js?v=1"></script>\n    <script src="supabase.js?v=auth2"></script>\n'
+          text = text.replace(marker, tags + marker, 1)
           p.write_text(text, encoding='utf-8')
           PY
 
@@ -41,5 +42,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git commit -m 'Load Supabase bridge after app code'
+          git commit -m 'Load OCR fix without changing UI'
           git push
