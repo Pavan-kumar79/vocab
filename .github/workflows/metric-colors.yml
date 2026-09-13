@@ -1,0 +1,32 @@
+name: Apply metric semantic colors
+on:
+  push:
+    paths:
+      - '.github/workflows/metric-colors.yml'
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply small metric color accents
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          marker='<style id="metric-semantic-colors">'
+          if marker not in s:
+              css='''<style id="metric-semantic-colors">\n/* Small semantic accents for home progress metrics. */\n.metric-coverage-accent { color:#f59e0b !important; }\n.metric-coverage-accent.metric-progress-fill { background:#f59e0b !important; }\n.metric-accuracy-accent { color:#22c55e !important; }\n.metric-accuracy-accent.metric-progress-fill { background:#22c55e !important; }\n</style>\n'''
+              js='''<script id="metric-semantic-color-logic">\n(function(){\n  function applyMetricColors(){\n    const home=document.getElementById('view-home');\n    if(!home) return;\n    const labels=[...home.querySelectorAll('h1,h2,h3,h4,h5,h6,p,span,div')];\n    for(const label of labels){\n      const text=(label.textContent||'').trim();\n      if(text!=='Bank Coverage' && text!=='Overall Accuracy') continue;\n      let card=label.closest('.border');\n      if(!card) card=label.parentElement?.parentElement;\n      if(!card) continue;\n      const coverage=text==='Bank Coverage';\n      const accent=coverage?'metric-coverage-accent':'metric-accuracy-accent';\n      card.classList.add(accent);\n      for(const el of card.querySelectorAll('*')){\n        const t=(el.textContent||'').trim();\n        if(/^\\d+(?:\\.\\d+)?%$/.test(t)) el.classList.add(accent);\n        const style=el.getAttribute('style')||'';\n        if(/width\\s*:/i.test(style)) el.classList.add(accent,'metric-progress-fill');\n      }\n    }\n  }\n  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',applyMetricColors);\n  else applyMetricColors();\n  setTimeout(applyMetricColors,500);\n})();\n</script>\n'''
+              s=s.replace('</head>',css+js+'</head>',1)
+              p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Add semantic colors to home progress metrics"
+          git push
