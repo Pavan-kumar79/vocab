@@ -77,6 +77,41 @@ body { background:#0b0b0b !important; color:#f5f5f5 !important; }
 #nav-troublesome i { color:#f59e0b !important; }
 #mobile-menu #nav-troublesome i { color:#f59e0b !important; }
 </style>
+<style id="metric-semantic-colors">
+/* Small semantic accents for home progress metrics. */
+.metric-coverage-accent { color:#f59e0b !important; }
+.metric-coverage-accent.metric-progress-fill { background:#f59e0b !important; }
+.metric-accuracy-accent { color:#22c55e !important; }
+.metric-accuracy-accent.metric-progress-fill { background:#22c55e !important; }
+</style>
+<script id="metric-semantic-color-logic">
+(function(){
+  function applyMetricColors(){
+    const home=document.getElementById('view-home');
+    if(!home) return;
+    const labels=[...home.querySelectorAll('h1,h2,h3,h4,h5,h6,p,span,div')];
+    for(const label of labels){
+      const text=(label.textContent||'').trim();
+      if(text!=='Bank Coverage' && text!=='Overall Accuracy') continue;
+      let card=label.closest('.border');
+      if(!card) card=label.parentElement?.parentElement;
+      if(!card) continue;
+      const coverage=text==='Bank Coverage';
+      const accent=coverage?'metric-coverage-accent':'metric-accuracy-accent';
+      card.classList.add(accent);
+      for(const el of card.querySelectorAll('*')){
+        const t=(el.textContent||'').trim();
+        if(/^\d+(?:\.\d+)?%$/.test(t)) el.classList.add(accent);
+        const style=el.getAttribute('style')||'';
+        if(/width\s*:/i.test(style)) el.classList.add(accent,'metric-progress-fill');
+      }
+    }
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',applyMetricColors);
+  else applyMetricColors();
+  setTimeout(applyMetricColors,500);
+})();
+</script>
 </head>
 <body class="h-full text-slate-800 dark:text-slate-100 dark:bg-slate-900 font-sans flex flex-col antialiased selection:bg-brand-500 selection:text-white">
 
