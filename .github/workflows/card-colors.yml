@@ -1,0 +1,32 @@
+name: Apply small card semantic colors
+on:
+  push:
+    paths:
+      - '.github/workflows/card-colors.yml'
+permissions:
+  contents: write
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply card colors only
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          marker='<style id="card-semantic-colors">'
+          if marker not in s:
+              css='''<style id="card-semantic-colors">\n/* Small semantic accents for the six home stat cards only. */\n.home-stat-total { color:#d6d6d6 !important; }\n.home-stat-untested { color:#60a5fa !important; }\n.home-stat-tested { color:#22c55e !important; }\n.home-stat-weak { color:#ef4444 !important; }\n.home-stat-revision { color:#a78bfa !important; }\n.home-stat-troublesome { color:#f59e0b !important; }\n</style>\n'''
+              js='''<script id="card-semantic-color-logic">\n(function(){\n  function applyCardColors(){\n    const home=document.getElementById('view-home');\n    if(!home) return;\n    const map={\n      'TOTAL WORDS':'home-stat-total',\n      'UNTESTED':'home-stat-untested',\n      'TESTED':'home-stat-tested',\n      'WEAK':'home-stat-weak',\n      'REVISION':'home-stat-revision',\n      'TROUBLESOME':'home-stat-troublesome'\n    };\n    for(const label of home.querySelectorAll('div,span,p')){\n      const key=(label.textContent||'').trim();\n      if(!map[key]) continue;\n      const card=label.closest('.border');\n      if(!card) continue;\n      const cls=map[key];\n      for(const el of card.querySelectorAll('i')) el.classList.add(cls);\n      for(const el of card.querySelectorAll('div,span,p')){\n        const t=(el.textContent||'').trim();\n        if(t===key || /^\\d+(?:\\.\\d+)?$/.test(t)) el.classList.add(cls);\n      }\n    }\n  }\n  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',applyCardColors);\n  else applyCardColors();\n  setTimeout(applyCardColors,500);\n})();\n</script>\n'''
+              s=s.replace('</head>',css+js+'</head>',1)
+              p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Add semantic colors to home stat cards"
+          git push
