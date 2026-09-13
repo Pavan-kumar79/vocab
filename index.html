@@ -112,46 +112,6 @@ body { background:#0b0b0b !important; color:#f5f5f5 !important; }
   setTimeout(applyMetricColors,500);
 })();
 </script>
-<style id="card-semantic-colors">
-/* Small semantic accents for the six home stat cards only. */
-#view-home .home-stat-total, #view-home .home-stat-total * { color:#d6d6d6 !important; }
-#view-home .home-stat-untested, #view-home .home-stat-untested * { color:#60a5fa !important; }
-#view-home .home-stat-tested, #view-home .home-stat-tested * { color:#22c55e !important; }
-#view-home .home-stat-weak, #view-home .home-stat-weak * { color:#ef4444 !important; }
-#view-home .home-stat-revision, #view-home .home-stat-revision * { color:#a78bfa !important; }
-#view-home .home-stat-troublesome, #view-home .home-stat-troublesome * { color:#f59e0b !important; }
-</style>
-<script id="card-semantic-color-logic">
-(function(){
-  function applyCardColors(){
-    const home=document.getElementById('view-home');
-    if(!home) return;
-    const map={
-      'TOTAL WORDS':'home-stat-total',
-      'UNTESTED':'home-stat-untested',
-      'TESTED':'home-stat-tested',
-      'WEAK':'home-stat-weak',
-      'REVISION':'home-stat-revision',
-      'TROUBLESOME':'home-stat-troublesome'
-    };
-    for(const label of home.querySelectorAll('div,span,p')){
-      const key=(label.textContent||'').trim();
-      if(!map[key]) continue;
-      const card=label.closest('.border');
-      if(!card) continue;
-      const cls=map[key];
-      for(const el of card.querySelectorAll('i')) el.classList.add(cls);
-      for(const el of card.querySelectorAll('div,span,p')){
-        const t=(el.textContent||'').trim();
-        if(t===key || /^\d+(?:\.\d+)?$/.test(t)) el.classList.add(cls);
-      }
-    }
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',applyCardColors);
-  else applyCardColors();
-  setTimeout(applyCardColors,500);
-})();
-</script>
 </head>
 <body class="h-full text-slate-800 dark:text-slate-100 dark:bg-slate-900 font-sans flex flex-col antialiased selection:bg-brand-500 selection:text-white">
 
