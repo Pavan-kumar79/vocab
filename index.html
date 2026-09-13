@@ -994,6 +994,7 @@
 
         async function refreshDataAndUI() {
             allWordsCache = await getAllWordsDB();
+            window.allWordsCache = allWordsCache;
 
             // Update Home Stats
             const total = allWordsCache.length;
