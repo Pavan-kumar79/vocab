@@ -112,7 +112,24 @@ body { background:#0b0b0b !important; color:#f5f5f5 !important; }
   setTimeout(applyMetricColors,500);
 })();
 </script>
-\n<style id="ui-visibility-fix-v1">\n/* Final visibility fix: keep the existing layout, make interactive controls and progress bars clearly visible. */\nbutton, .nav-btn { color:#f5f5f5 !important; }\nbutton:hover, button:focus, button:focus-visible, .nav-btn:hover, .nav-btn:focus, .nav-btn:focus-visible { color:#fff !important; background:#2f2f2f !important; }\n[class*="bg-amber-400"], [class*="bg-amber-500"] { background:#f59e0b !important; color:#111 !important; }\n[class*="hover:bg-amber-300"]:hover, [class*="hover:bg-amber-400"]:hover, [class*="hover:bg-amber-500"]:hover { background:#fbbf24 !important; color:#111 !important; }\n[class*="bg-brand-"], [class*="bg-sky-"], [class*="bg-blue-500"], [class*="bg-blue-600"] { background:#0284c7 !important; color:#fff !important; }\n[class*="hover:bg-brand-"]:hover, [class*="hover:bg-sky-"]:hover, [class*="hover:bg-blue-"]:hover { background:#0369a1 !important; color:#fff !important; }\n[class*="bg-emerald-"], [class*="bg-green-"] { background:#16a34a !important; color:#fff !important; }\n[class*="bg-red-"], [class*="bg-rose-"] { background:#dc2626 !important; color:#fff !important; }\n[class*="bg-purple-"], [class*="bg-indigo-"] { background:#4f46e5 !important; color:#fff !important; }\n/* Progress bars: override the broad monochrome background rule only for actual filled bars. */\n#coverage-bar, #accuracy-bar, [id*="progress-bar"] { background:#f59e0b !important; opacity:1 !important; }\n#accuracy-bar { background:#22c55e !important; }\n[class*="progress"] [style*="width"], [style*="width: 0%"], [style*="width:0%"] { background:#777 !important; opacity:1 !important; }\n/* Quiz progress and selected/correct states should never become black. */\n[class*="border-brand-"], [class*="border-sky-"], [class*="border-emerald-"], [class*="border-green-"] { border-color:#38bdf8 !important; }\n</style>\n</head>
+\n<style id="ui-visibility-fix-v1">
+/* Final visibility fix: keep the existing layout, make interactive controls and progress bars clearly visible. */
+button, .nav-btn { color:#f5f5f5 !important; }
+button:hover, button:focus, button:focus-visible, .nav-btn:hover, .nav-btn:focus, .nav-btn:focus-visible { color:#fff !important; background:#2f2f2f !important; }
+[class*="bg-amber-400"], [class*="bg-amber-500"] { background:#f59e0b !important; color:#111 !important; }
+[class*="hover:bg-amber-300"]:hover, [class*="hover:bg-amber-400"]:hover, [class*="hover:bg-amber-500"]:hover { background:#fbbf24 !important; color:#111 !important; }
+[class*="bg-brand-"], [class*="bg-sky-"], [class*="bg-blue-500"], [class*="bg-blue-600"] { background:#0284c7 !important; color:#fff !important; }
+[class*="hover:bg-brand-"]:hover, [class*="hover:bg-sky-"]:hover, [class*="hover:bg-blue-"]:hover { background:#0369a1 !important; color:#fff !important; }
+[class*="bg-emerald-"], [class*="bg-green-"] { background:#16a34a !important; color:#fff !important; }
+[class*="bg-red-"], [class*="bg-rose-"] { background:#dc2626 !important; color:#fff !important; }
+[class*="bg-purple-"], [class*="bg-indigo-"] { background:#4f46e5 !important; color:#fff !important; }
+/* Progress bars: override the broad monochrome background rule only for actual filled bars. */
+#coverage-bar, #accuracy-bar, [id*="progress-bar"] { background:#f59e0b !important; opacity:1 !important; }
+#accuracy-bar { background:#22c55e !important; }
+[class*="progress"] [style*="width"], [style*="width: 0%"], [style*="width:0%"] { background:#777 !important; opacity:1 !important; }
+/* Quiz progress and selected/correct states should never become black. */
+[class*="border-brand-"], [class*="border-sky-"], [class*="border-emerald-"], [class*="border-green-"] { border-color:#38bdf8 !important; }
+</style>\n<style id="main-home-button-fix-v2">#view-home button[onclick*="startQuickQuiz"]{background:#f59e0b!important;color:#111!important;opacity:1!important}#view-home button[onclick*="startQuickQuiz"] i{color:#111!important}#view-home button[onclick*="startQuickQuiz"]:hover,#view-home button[onclick*="startQuickQuiz"]:focus,#view-home button[onclick*="startQuickQuiz"]:focus-visible{background:#fbbf24!important;color:#111!important}</style></head>
 <body class="h-full text-slate-800 dark:text-slate-100 dark:bg-slate-900 font-sans flex flex-col antialiased selection:bg-brand-500 selection:text-white">
 
     <!-- APP HEADER -->
