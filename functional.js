@@ -289,58 +289,6 @@
     if (typeof window.showToast === 'function') window.showToast(`Saved ${saved} confirmed entries. Review the remaining entries.`, 'success');
   };
 
-  // Stronger quiz selection: untested first, then weak/wrong/troublesome, then least tested.
-  window.startConfiguredQuiz = function () {
-    const bank = Array.isArray(window.allWordsCache) ? window.allWordsCache : [];
-    if (!bank.length) {
-      if (typeof window.showToast === 'function') window.showToast('Add vocabulary first.', 'error');
-      return;
-    }
-    const modeEl = document.getElementById('quiz-mode-select');
-    const mode = modeEl ? modeEl.value : 'All Vocabulary';
-    let pool = bank.filter(w => {
-      if (mode === 'Untested') return Number(w.timesAsked || 0) === 0;
-      if (mode === 'Weak Words') return w.learningStatus === 'Weak';
-      if (mode === 'Troublesome') return !!w.troublesome;
-      if (mode === 'Revision') return ['Revision','Learning','Good'].includes(w.learningStatus);
-      if (['One Word Substitution','Idioms & Phrases','Synonyms','Antonyms','Homonyms'].includes(mode)) return (w.categories || []).includes(mode);
-      return true;
-    });
-    if (!pool.length) {
-      if (typeof window.showToast === 'function') window.showToast('No words available for this quiz.', 'error');
-      return;
-    }
-    const now = Date.now();
-    pool.sort((a,b) => {
-      const score = w => {
-        const asked = Number(w.timesAsked || 0), wrong = Number(w.timesWrong || 0), acc = Number(w.accuracy || 0);
-        let s = 0;
-        if (!asked) s += 100000;
-        s += 5000 / (asked + 1);
-        s += wrong * 900;
-        s += (100 - acc) * 8;
-        if (w.troublesome) s += 700;
-        if (w.learningStatus === 'Weak') s += 600;
-        if (w.learningStatus === 'Revision') s += 250;
-        const last = w.lastAsked ? new Date(w.lastAsked).getTime() : 0;
-        if (last) s += Math.min(30, Math.max(0, (now-last)/86400000))*10;
-        return s + Math.random()*10;
-      };
-      return score(b)-score(a);
-    });
-    const len = Math.min((window.activeQuiz && window.activeQuiz.length) || 20, pool.length);
-    const selected = pool.slice(0, len);
-    if (!window.activeQuiz) window.activeQuiz = {};
-    window.activeQuiz.questions = selected.map(w => makeQuestion(w, bank));
-    window.activeQuiz.currentIndex = 0;
-    window.activeQuiz.score = 0;
-    window.activeQuiz.userAnswers = [];
-    window.activeQuiz.startTime = Date.now();
-    if (typeof window.navigateTo === 'function') window.navigateTo('quiz-active');
-    if (typeof window.startQuizTimer === 'function') window.startQuizTimer();
-    if (typeof window.renderCurrentQuestion === 'function') window.renderCurrentQuestion();
-  };
-
   function splitList(v) { return String(v || '').split(/[,;|]/).map(clean).filter(Boolean); }
   function makeQuestion(target, bank) {
     const syn = splitList(target.synonyms), ant = splitList(target.antonyms);
