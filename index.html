@@ -1,0 +1,1790 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSC CGL English Vocabulary Trainer</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tesseract.js for In-Browser OCR -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <!-- Canvas Confetti for Quiz Completion -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="h-full text-slate-800 dark:text-slate-100 dark:bg-slate-900 font-sans flex flex-col antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- APP HEADER -->
+    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo & Title -->
+                <div class="flex items-center space-x-3 cursor-pointer" onclick="navigateTo('home')">
+                    <div class="bg-gradient-to-tr from-brand-600 to-indigo-600 text-white p-2.5 rounded-xl shadow-md">
+                        <i class="fa-solid fa-graduation-cap text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-brand-700 to-indigo-700 dark:from-brand-500 dark:to-indigo-400 bg-clip-text text-transparent">SSC CGL Vocab Pro</h1>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Personal Study Companion</p>
+                    </div>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center space-x-1">
+                    <button onclick="navigateTo('home')" id="nav-home" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 transition-all">
+                        <i class="fa-solid fa-house"></i><span>Home</span>
+                    </button>
+                    <button onclick="navigateTo('quiz-setup')" id="nav-quiz" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 transition-all">
+                        <i class="fa-solid fa-brain"></i><span>Quiz</span>
+                    </button>
+                    <button onclick="navigateTo('word-bank')" id="nav-bank" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 transition-all">
+                        <i class="fa-solid fa-book-bookmark"></i><span>Word Bank</span>
+                    </button>
+                    <button onclick="navigateTo('add-word')" id="nav-add" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 transition-all">
+                        <i class="fa-solid fa-plus-circle"></i><span>Add Word</span>
+                    </button>
+                    <button onclick="navigateTo('ocr-import')" id="nav-ocr" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 transition-all">
+                        <i class="fa-solid fa-camera"></i><span>Photo Import</span>
+                    </button>
+                    <button onclick="navigateTo('troublesome')" id="nav-troublesome" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 transition-all">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-500"></i><span>Troublesome</span>
+                    </button>
+                    <button onclick="navigateTo('analytics')" id="nav-analytics" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 transition-all">
+                        <i class="fa-solid fa-chart-line"></i><span>Analytics</span>
+                    </button>
+                    <button onclick="navigateTo('backup')" id="nav-backup" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold flex items-center space-x-2 transition-all">
+                        <i class="fa-solid fa-database"></i><span>Backup</span>
+                    </button>
+                </nav>
+
+                <!-- Action Controls -->
+                <div class="flex items-center space-x-2">
+                    <button onclick="toggleDarkMode()" title="Toggle Dark/Light Mode" class="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700 transition">
+                        <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
+                    </button>
+                    <!-- Mobile Hamburger -->
+                    <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700">
+                        <i class="fa-solid fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobile-menu" class="hidden md:hidden border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 pt-2 pb-4 space-y-1 shadow-lg">
+            <button onclick="navigateTo('home'); toggleMobileMenu();" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-semibold flex items-center space-x-3 hover:bg-slate-100 dark:hover:bg-slate-700">
+                <i class="fa-solid fa-house w-5 text-brand-600"></i><span>Home Dashboard</span>
+            </button>
+            <button onclick="navigateTo('quiz-setup'); toggleMobileMenu();" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-semibold flex items-center space-x-3 hover:bg-slate-100 dark:hover:bg-slate-700">
+                <i class="fa-solid fa-brain w-5 text-indigo-600"></i><span>Quiz Center</span>
+            </button>
+            <button onclick="navigateTo('word-bank'); toggleMobileMenu();" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-semibold flex items-center space-x-3 hover:bg-slate-100 dark:hover:bg-slate-700">
+                <i class="fa-solid fa-book-bookmark w-5 text-emerald-600"></i><span>Word Bank</span>
+            </button>
+            <button onclick="navigateTo('add-word'); toggleMobileMenu();" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-semibold flex items-center space-x-3 hover:bg-slate-100 dark:hover:bg-slate-700">
+                <i class="fa-solid fa-plus-circle w-5 text-sky-600"></i><span>Add New Word</span>
+            </button>
+            <button onclick="navigateTo('ocr-import'); toggleMobileMenu();" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-semibold flex items-center space-x-3 hover:bg-slate-100 dark:hover:bg-slate-700">
+                <i class="fa-solid fa-camera w-5 text-purple-600"></i><span>Blackbook Photo OCR</span>
+            </button>
+            <button onclick="navigateTo('troublesome'); toggleMobileMenu();" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-semibold flex items-center space-x-3 hover:bg-slate-100 dark:hover:bg-slate-700">
+                <i class="fa-solid fa-triangle-exclamation w-5 text-amber-500"></i><span>Troublesome Words</span>
+            </button>
+            <button onclick="navigateTo('analytics'); toggleMobileMenu();" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-semibold flex items-center space-x-3 hover:bg-slate-100 dark:hover:bg-slate-700">
+                <i class="fa-solid fa-chart-line w-5 text-blue-600"></i><span>Progress & Analytics</span>
+            </button>
+            <button onclick="navigateTo('backup'); toggleMobileMenu();" class="w-full text-left px-3 py-2.5 rounded-lg text-sm font-semibold flex items-center space-x-3 hover:bg-slate-100 dark:hover:bg-slate-700">
+                <i class="fa-solid fa-database w-5 text-slate-600"></i><span>Backup & Restore</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 transition-all">
+
+        <!-- GLOBAL TOAST NOTIFICATION CONTAINER -->
+        <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+        <!-- VIEW 1: HOME DASHBOARD -->
+        <section id="view-home" class="view-panel space-y-6">
+            <!-- HERO START QUIZ BANNER -->
+            <div class="relative overflow-hidden bg-gradient-to-r from-brand-700 via-indigo-700 to-purple-800 rounded-2xl p-6 sm:p-8 text-white shadow-xl">
+                <div class="relative z-10 max-w-2xl">
+                    <span class="inline-block px-3 py-1 bg-white/20 backdrop-blur-md text-xs font-semibold rounded-full uppercase tracking-wider mb-3">SSC CGL Prep Engine</span>
+                    <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight mb-2">Master 10,000+ Words Systematically</h2>
+                    <p class="text-slate-200 text-sm sm:text-base mb-6">Our quiz engine prioritizes untested and weak words first so you cover every single term without wasting time on easy repeats.</p>
+                    
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button onclick="startQuickQuiz(20)" class="w-full sm:w-auto px-6 py-4 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition flex items-center justify-center space-x-3 text-lg">
+                            <i class="fa-solid fa-play"></i>
+                            <span>START 20 QUESTION QUIZ</span>
+                        </button>
+                        <button onclick="navigateTo('ocr-import')" class="w-full sm:w-auto px-5 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white font-semibold rounded-xl transition flex items-center justify-center space-x-2 border border-white/20">
+                            <i class="fa-solid fa-camera"></i>
+                            <span>Scan Blackbook Page</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="absolute -right-10 -bottom-10 opacity-10 text-white pointer-events-none hidden lg:block">
+                    <i class="fa-solid fa-book-open text-[280px]"></i>
+                </div>
+            </div>
+
+            <!-- EMPTY STATE WARNING IF NO WORDS -->
+            <div id="home-empty-banner" class="hidden bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="flex items-center space-x-4">
+                    <div class="p-3 bg-amber-100 dark:bg-amber-800/50 rounded-xl text-amber-700 dark:text-amber-300 text-2xl">
+                        <i class="fa-solid fa-folder-open"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-amber-900 dark:text-amber-200 text-base">Your Vocabulary Bank is empty!</h4>
+                        <p class="text-xs sm:text-sm text-amber-700 dark:text-amber-400">Add words manually, scan your Blackbook pages, or import sample data to get started.</p>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2 w-full sm:w-auto">
+                    <button onclick="loadSampleData()" class="w-full sm:w-auto px-4 py-2 bg-amber-600 text-white text-xs font-bold rounded-lg shadow hover:bg-amber-700 transition">
+                        Load 15 SSC Sample Words
+                    </button>
+                </div>
+            </div>
+
+            <!-- KEY STATS METRICS GRID -->
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+                    <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Total Words</span>
+                    <div class="flex items-baseline justify-between mt-2">
+                        <span id="stat-total-words" class="text-2xl font-black text-slate-900 dark:text-white">0</span>
+                        <i class="fa-solid fa-layer-group text-brand-500 text-lg"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+                    <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Untested</span>
+                    <div class="flex items-baseline justify-between mt-2">
+                        <span id="stat-untested" class="text-2xl font-black text-slate-600 dark:text-slate-300">0</span>
+                        <i class="fa-solid fa-circle-question text-slate-400 text-lg"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+                    <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Tested</span>
+                    <div class="flex items-baseline justify-between mt-2">
+                        <span id="stat-tested" class="text-2xl font-black text-emerald-600 dark:text-emerald-400">0</span>
+                        <i class="fa-solid fa-circle-check text-emerald-500 text-lg"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+                    <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Weak</span>
+                    <div class="flex items-baseline justify-between mt-2">
+                        <span id="stat-weak" class="text-2xl font-black text-rose-600 dark:text-rose-400">0</span>
+                        <i class="fa-solid fa-heart-crack text-rose-500 text-lg"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+                    <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Revision</span>
+                    <div class="flex items-baseline justify-between mt-2">
+                        <span id="stat-revision" class="text-2xl font-black text-sky-600 dark:text-sky-400">0</span>
+                        <i class="fa-solid fa-rotate-right text-sky-500 text-lg"></i>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+                    <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">Troublesome</span>
+                    <div class="flex items-baseline justify-between mt-2">
+                        <span id="stat-troublesome" class="text-2xl font-black text-amber-600 dark:text-amber-400">0</span>
+                        <i class="fa-solid fa-triangle-exclamation text-amber-500 text-lg"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COVERAGE & ACCURACY PROGRESS PANEL -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- COVERAGE BAR -->
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <div class="flex justify-between items-center mb-3">
+                        <div>
+                            <h3 class="font-bold text-slate-900 dark:text-white text-lg">Bank Coverage</h3>
+                            <p class="text-xs text-slate-500">Percentage of vocabulary tested at least once</p>
+                        </div>
+                        <span id="coverage-percentage" class="text-2xl font-extrabold text-brand-600">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-4 overflow-hidden mb-3">
+                        <div id="coverage-bar" class="bg-gradient-to-r from-brand-500 to-indigo-600 h-full rounded-full transition-all duration-700 w-0"></div>
+                    </div>
+                    <div class="flex justify-between text-xs font-medium text-slate-500">
+                        <span id="coverage-tested-count">0 Tested</span>
+                        <span id="coverage-total-count">0 Total Words</span>
+                    </div>
+                </div>
+
+                <!-- OVERALL ACCURACY -->
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <div class="flex justify-between items-center mb-3">
+                        <div>
+                            <h3 class="font-bold text-slate-900 dark:text-white text-lg">Overall Accuracy</h3>
+                            <p class="text-xs text-slate-500">Correct answers ratio across all quiz sessions</p>
+                        </div>
+                        <span id="overall-accuracy-pct" class="text-2xl font-extrabold text-emerald-600">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-4 overflow-hidden mb-3">
+                        <div id="accuracy-bar" class="bg-gradient-to-r from-emerald-500 to-teal-600 h-full rounded-full transition-all duration-700 w-0"></div>
+                    </div>
+                    <div class="flex justify-between text-xs font-medium text-slate-500">
+                        <span id="accuracy-correct-stats">0 Correct</span>
+                        <span id="accuracy-total-asked">0 Questions Attempted</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUICK ACCESS CATEGORIES -->
+            <div>
+                <h3 class="font-bold text-slate-900 dark:text-white text-lg mb-4">Practice by Category</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                    <button onclick="startCategoryQuiz('One Word Substitution')" class="p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-brand-500 dark:hover:border-brand-500 transition text-left group">
+                        <i class="fa-solid fa-font text-brand-600 text-xl mb-2 group-hover:scale-110 transition-transform"></i>
+                        <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">OWS</h4>
+                        <span id="cat-count-ows" class="text-xs text-slate-500">0 words</span>
+                    </button>
+                    <button onclick="startCategoryQuiz('Idioms & Phrases')" class="p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-brand-500 dark:hover:border-brand-500 transition text-left group">
+                        <i class="fa-solid fa-comments text-indigo-600 text-xl mb-2 group-hover:scale-110 transition-transform"></i>
+                        <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">Idioms</h4>
+                        <span id="cat-count-idioms" class="text-xs text-slate-500">0 words</span>
+                    </button>
+                    <button onclick="startCategoryQuiz('Synonyms')" class="p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-brand-500 dark:hover:border-brand-500 transition text-left group">
+                        <i class="fa-solid fa-clone text-emerald-600 text-xl mb-2 group-hover:scale-110 transition-transform"></i>
+                        <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">Synonyms</h4>
+                        <span id="cat-count-synonyms" class="text-xs text-slate-500">0 words</span>
+                    </button>
+                    <button onclick="startCategoryQuiz('Antonyms')" class="p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-brand-500 dark:hover:border-brand-500 transition text-left group">
+                        <i class="fa-solid fa-right-left text-amber-600 text-xl mb-2 group-hover:scale-110 transition-transform"></i>
+                        <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">Antonyms</h4>
+                        <span id="cat-count-antonyms" class="text-xs text-slate-500">0 words</span>
+                    </button>
+                    <button onclick="startCategoryQuiz('Homonyms')" class="p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:border-brand-500 dark:hover:border-brand-500 transition text-left group col-span-2 sm:col-span-1">
+                        <i class="fa-solid fa-spell-check text-purple-600 text-xl mb-2 group-hover:scale-110 transition-transform"></i>
+                        <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">Homonyms</h4>
+                        <span id="cat-count-homonyms" class="text-xs text-slate-500">0 words</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: QUIZ SETUP & QUIZ ENGINE -->
+        <section id="view-quiz-setup" class="view-panel hidden space-y-6">
+            <div class="max-w-2xl mx-auto bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-md space-y-6">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-900 dark:text-white">Configure Quiz</h2>
+                    <p class="text-sm text-slate-500">Select mode and number of questions to begin your study session.</p>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Quiz Mode</label>
+                        <select id="quiz-mode-select" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <option value="All Vocabulary">All Vocabulary (System Priority)</option>
+                            <option value="Untested">Untested Words First</option>
+                            <option value="Weak Words">Weak Words Focus</option>
+                            <option value="Troublesome">Troublesome Words Only</option>
+                            <option value="Revision">Revision Spaced Memory</option>
+                            <option value="One Word Substitution">Category: One Word Substitution (OWS)</option>
+                            <option value="Idioms & Phrases">Category: Idioms & Phrases</option>
+                            <option value="Synonyms">Category: Synonyms</option>
+                            <option value="Antonyms">Category: Antonyms</option>
+                            <option value="Homonyms">Category: Homonyms</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Number of Questions</label>
+                        <div class="grid grid-cols-4 gap-3">
+                            <button onclick="setQuizLength(10)" class="quiz-len-btn py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-700">10</button>
+                            <button onclick="setQuizLength(20)" class="quiz-len-btn py-2.5 rounded-xl border-2 border-brand-500 bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 text-sm font-bold">20</button>
+                            <button onclick="setQuizLength(30)" class="quiz-len-btn py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-700">30</button>
+                            <button onclick="setQuizLength(50)" class="quiz-len-btn py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-700">50</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button onclick="startConfiguredQuiz()" class="w-full py-4 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center space-x-2 text-lg">
+                    <i class="fa-solid fa-play"></i>
+                    <span>START QUIZ</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- VIEW 3: ACTIVE QUIZ DISPLAY -->
+        <section id="view-quiz-active" class="view-panel hidden max-w-3xl mx-auto space-y-6">
+            <!-- QUIZ PROGRESS HEADER -->
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <span id="quiz-progress-text" class="text-sm font-bold text-slate-700 dark:text-slate-200">Question 1 of 20</span>
+                    <span id="quiz-category-tag" class="px-2.5 py-1 bg-brand-100 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 text-xs font-bold rounded-full">OWS</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span id="quiz-timer" class="text-xs font-mono font-bold text-slate-500"><i class="fa-regular fa-clock mr-1"></i>00:00</span>
+                    <button onclick="abortQuiz()" class="text-xs text-rose-600 hover:underline font-semibold">Exit Quiz</button>
+                </div>
+            </div>
+
+            <!-- PROGRESS BAR -->
+            <div class="w-full bg-slate-200 dark:bg-slate-700 h-2 rounded-full overflow-hidden">
+                <div id="quiz-progress-bar" class="bg-brand-600 h-full w-0 transition-all duration-300"></div>
+            </div>
+
+            <!-- QUESTION CARD -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-lg space-y-6">
+                <div>
+                    <span id="question-prompt-type" class="text-xs font-extrabold uppercase tracking-wider text-brand-600 dark:text-brand-400">Word Meaning</span>
+                    <h3 id="question-prompt-text" class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-1">Abate</h3>
+                </div>
+
+                <!-- OPTIONS LIST -->
+                <div id="quiz-options-container" class="space-y-3">
+                    <!-- Dynamic choices inserted here -->
+                </div>
+
+                <!-- SUBMIT / NEXT ACTION -->
+                <div id="quiz-feedback-box" class="hidden p-4 rounded-xl border">
+                    <!-- Answer rationale feedback -->
+                </div>
+
+                <div class="flex justify-end pt-2">
+                    <button id="quiz-next-btn" onclick="nextQuizQuestion()" class="hidden px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow transition items-center space-x-2">
+                        <span>Next Question</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 4: QUIZ RESULTS SCREEN -->
+        <section id="view-quiz-result" class="view-panel hidden max-w-4xl mx-auto space-y-6">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-xl text-center space-y-6">
+                <div class="inline-flex p-4 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-full text-4xl">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <h2 class="text-3xl font-black text-slate-900 dark:text-white">Quiz Completed!</h2>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 py-4">
+                    <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <span class="text-xs text-slate-500 uppercase font-semibold">Score</span>
+                        <p id="result-score" class="text-2xl font-black text-brand-600 mt-1">0/0</p>
+                    </div>
+                    <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <span class="text-xs text-slate-500 uppercase font-semibold">Accuracy</span>
+                        <p id="result-accuracy" class="text-2xl font-black text-emerald-600 mt-1">0%</p>
+                    </div>
+                    <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <span class="text-xs text-slate-500 uppercase font-semibold">Time Taken</span>
+                        <p id="result-time" class="text-2xl font-black text-indigo-600 mt-1">00:00</p>
+                    </div>
+                    <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <span class="text-xs text-slate-500 uppercase font-semibold">Attempted</span>
+                        <p id="result-attempted" class="text-2xl font-black text-purple-600 mt-1">0</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button onclick="startQuickQuiz(20)" class="px-6 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Start Another Quiz</span>
+                    </button>
+                    <button onclick="navigateTo('home')" class="px-6 py-3 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 font-bold rounded-xl hover:bg-slate-300 transition">
+                        Back to Dashboard
+                    </button>
+                </div>
+            </div>
+
+            <!-- QUIZ REVIEW TABLE -->
+            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+                <h3 class="font-bold text-lg text-slate-900 dark:text-white">Question Review</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50 dark:bg-slate-900/50 text-slate-500 border-b border-slate-200 dark:border-slate-700">
+                            <tr>
+                                <th class="p-3">Status</th>
+                                <th class="p-3">Word</th>
+                                <th class="p-3">Your Answer</th>
+                                <th class="p-3">Correct Answer / Meaning</th>
+                            </tr>
+                        </thead>
+                        <tbody id="result-review-tbody" class="divide-y divide-slate-100 dark:divide-slate-700">
+                            <!-- Dynamic Review Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 5: WORD BANK -->
+        <section id="view-word-bank" class="view-panel hidden space-y-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-900 dark:text-white">Vocabulary Bank</h2>
+                    <p class="text-sm text-slate-500">Search, filter, and inspect your full word database.</p>
+                </div>
+                <button onclick="navigateTo('add-word')" class="px-4 py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-sm font-bold rounded-xl shadow flex items-center space-x-2 self-start md:self-auto">
+                    <i class="fa-solid fa-plus"></i><span>Add Word</span>
+                </button>
+            </div>
+
+            <!-- FILTERS AND SEARCH TOOLBAR -->
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div class="relative">
+                        <i class="fa-solid fa-search absolute left-3.5 top-3.5 text-slate-400"></i>
+                        <input type="text" id="bank-search-input" onkeyup="filterWordBank()" placeholder="Search word, meaning, synonym..." class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                    </div>
+
+                    <select id="bank-filter-category" onchange="filterWordBank()" class="px-3 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="ALL">All Categories</option>
+                        <option value="One Word Substitution">One Word Substitution</option>
+                        <option value="Idioms & Phrases">Idioms & Phrases</option>
+                        <option value="Synonyms">Synonyms</option>
+                        <option value="Antonyms">Antonyms</option>
+                        <option value="Homonyms">Homonyms</option>
+                    </select>
+
+                    <select id="bank-filter-status" onchange="filterWordBank()" class="px-3 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="ALL">All Statuses</option>
+                        <option value="Untested">Untested</option>
+                        <option value="Learning">Learning</option>
+                        <option value="Good">Good</option>
+                        <option value="Weak">Weak</option>
+                        <option value="Revision">Revision</option>
+                        <option value="Troublesome">Troublesome Only</option>
+                    </select>
+
+                    <select id="bank-sort-by" onchange="filterWordBank()" class="px-3 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500">
+                        <option value="alpha-asc">Alphabetical (A-Z)</option>
+                        <option value="alpha-desc">Alphabetical (Z-A)</option>
+                        <option value="date-desc">Newest Added First</option>
+                        <option value="times-asc">Least Tested First</option>
+                        <option value="accuracy-asc">Lowest Accuracy First</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- WORD LIST TABLE / CARDS -->
+            <div class="bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-700 text-slate-500 font-semibold">
+                            <tr>
+                                <th class="p-3.5">Word</th>
+                                <th class="p-3.5">Meaning</th>
+                                <th class="p-3.5">Categories</th>
+                                <th class="p-3.5">Stats (Asked/Acc)</th>
+                                <th class="p-3.5">Status</th>
+                                <th class="p-3.5 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="word-bank-tbody" class="divide-y divide-slate-100 dark:divide-slate-700">
+                            <!-- Dynamic Word Rows -->
+                        </tbody>
+                    </table>
+                </div>
+                <div id="bank-pagination-footer" class="p-4 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-700 flex items-center justify-between text-xs text-slate-500">
+                    <span id="bank-count-info">Showing 0 words</span>
+                    <div class="flex space-x-2">
+                        <button id="bank-prev-btn" onclick="changeBankPage(-1)" class="px-3 py-1.5 bg-white dark:bg-slate-800 border rounded shadow-sm hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-50">Previous</button>
+                        <button id="bank-next-btn" onclick="changeBankPage(1)" class="px-3 py-1.5 bg-white dark:bg-slate-800 border rounded shadow-sm hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-50">Next</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 6: ADD / EDIT WORD FORM -->
+        <section id="view-add-word" class="view-panel hidden max-w-2xl mx-auto space-y-6">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-md space-y-6">
+                <div>
+                    <h2 id="add-word-title" class="text-2xl font-black text-slate-900 dark:text-white">Add New Vocabulary Word</h2>
+                    <p class="text-sm text-slate-500">Fast entry for your custom SSC CGL study terms.</p>
+                </div>
+
+                <form id="add-word-form" onsubmit="handleWordSubmit(event)" class="space-y-4">
+                    <input type="hidden" id="form-word-id" value="">
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Word / Term <span class="text-rose-500">*</span></label>
+                        <input type="text" id="form-word" onkeyup="checkDuplicateWordLive()" required placeholder="e.g., Abate" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        <p id="duplicate-warning" class="hidden text-xs font-bold text-amber-600 dark:text-amber-400 mt-1 flex items-center">
+                            <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+                            Word already exists! Saving will update categories & definition.
+                        </p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Meaning / Definition <span class="text-rose-500">*</span></label>
+                        <textarea id="form-meaning" required rows="2" placeholder="e.g., Become less intense or widespread" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-brand-500 focus:outline-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-500 mb-2">Categories (Select all that apply)</label>
+                        <div class="flex flex-wrap gap-2" id="form-category-badges">
+                            <label class="cursor-pointer px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-xs font-bold flex items-center space-x-1.5 has-[:checked]:bg-brand-600 has-[:checked]:text-white has-[:checked]:border-brand-600">
+                                <input type="checkbox" value="One Word Substitution" class="hidden cat-checkbox">
+                                <span>OWS</span>
+                            </label>
+                            <label class="cursor-pointer px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-xs font-bold flex items-center space-x-1.5 has-[:checked]:bg-brand-600 has-[:checked]:text-white has-[:checked]:border-brand-600">
+                                <input type="checkbox" value="Idioms & Phrases" class="hidden cat-checkbox">
+                                <span>Idioms</span>
+                            </label>
+                            <label class="cursor-pointer px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-xs font-bold flex items-center space-x-1.5 has-[:checked]:bg-brand-600 has-[:checked]:text-white has-[:checked]:border-brand-600">
+                                <input type="checkbox" value="Synonyms" class="hidden cat-checkbox">
+                                <span>Synonyms</span>
+                            </label>
+                            <label class="cursor-pointer px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-xs font-bold flex items-center space-x-1.5 has-[:checked]:bg-brand-600 has-[:checked]:text-white has-[:checked]:border-brand-600">
+                                <input type="checkbox" value="Antonyms" class="hidden cat-checkbox">
+                                <span>Antonyms</span>
+                            </label>
+                            <label class="cursor-pointer px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-xs font-bold flex items-center space-x-1.5 has-[:checked]:bg-brand-600 has-[:checked]:text-white has-[:checked]:border-brand-600">
+                                <input type="checkbox" value="Homonyms" class="hidden cat-checkbox">
+                                <span>Homonyms</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Synonym(s)</label>
+                            <input type="text" id="form-synonyms" placeholder="e.g., Subside, diminish" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Antonym(s)</label>
+                            <input type="text" id="form-antonyms" placeholder="e.g., Increase, intensify" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Example Sentence</label>
+                        <input type="text" id="form-example" placeholder="e.g., The storm began to abate towards morning." class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Source</label>
+                            <select id="form-source" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <option value="Blackbook">Blackbook</option>
+                                <option value="SSC Mock Test">SSC Mock Test</option>
+                                <option value="SSC Study Material">SSC Study Material</option>
+                                <option value="Manual Entry">Manual Entry</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center pt-5">
+                            <label class="cursor-pointer flex items-center space-x-2 text-sm font-bold text-amber-600 dark:text-amber-400">
+                                <input type="checkbox" id="form-troublesome" class="w-5 h-5 rounded border-slate-300 text-amber-500 focus:ring-amber-500">
+                                <span>Mark as Troublesome Word</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-3 pt-2">
+                        <button type="submit" class="flex-1 py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow transition">Save Word</button>
+                        <button type="button" onclick="resetWordForm()" class="px-5 py-3 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-300 transition">Reset</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- VIEW 7: BLACKBOOK OCR PHOTO IMPORT -->
+        <section id="view-ocr-import" class="view-panel hidden space-y-6">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-md space-y-6">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-camera text-brand-600"></i> Blackbook Photo OCR Scanner
+                    </h2>
+                    <p class="text-sm text-slate-500">Upload phone photos of Blackbook pages to automatically extract words and meanings in seconds.</p>
+                </div>
+
+                <!-- PHOTO UPLOAD BOX -->
+                <div class="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl p-8 text-center hover:border-brand-500 dark:hover:border-brand-500 transition bg-slate-50 dark:bg-slate-900/50">
+                    <input type="file" id="ocr-file-input" accept="image/*" multiple class="hidden" onchange="handleImageSelection(event)">
+                    <label for="ocr-file-input" class="cursor-pointer flex flex-col items-center justify-center space-y-3">
+                        <div class="p-4 bg-brand-100 dark:bg-brand-900/40 text-brand-600 rounded-full text-3xl">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                        </div>
+                        <div>
+                            <span class="font-bold text-slate-800 dark:text-slate-100">Click to capture / upload photos</span>
+                            <p class="text-xs text-slate-500 mt-1">Supports JPG, PNG, WEBP (Single or Multiple Pages)</p>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- OCR PROGRESS INDICATOR -->
+                <div id="ocr-progress-box" class="hidden bg-slate-50 dark:bg-slate-900 p-5 rounded-xl border border-slate-200 dark:border-slate-700 space-y-3">
+                    <div class="flex justify-between items-center text-sm font-bold">
+                        <span id="ocr-status-text" class="text-brand-600">Initializing Optical Character Recognition...</span>
+                        <span id="ocr-percentage" class="text-slate-500">0%</span>
+                    </div>
+                    <div class="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden">
+                        <div id="ocr-progress-bar" class="bg-brand-600 h-full w-0 transition-all duration-200"></div>
+                    </div>
+                </div>
+
+                <!-- OCR CANDIDATES REVIEW TABLE -->
+                <div id="ocr-results-container" class="hidden space-y-4">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <h3 class="font-bold text-lg text-slate-900 dark:text-white">Extracted Entries (<span id="ocr-candidates-count">0</span>)</h3>
+                        <div class="flex space-x-2">
+                            <button onclick="acceptAllOcrCandidates()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow transition">
+                                <i class="fa-solid fa-check-double mr-1"></i> Accept All Confirmed
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="overflow-x-auto max-h-96 custom-scrollbar border border-slate-200 dark:border-slate-700 rounded-xl">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-100 dark:bg-slate-900 sticky top-0 text-slate-600 font-bold">
+                                <tr>
+                                    <th class="p-3">Status</th>
+                                    <th class="p-3">Extracted Word</th>
+                                    <th class="p-3">Extracted Meaning</th>
+                                    <th class="p-3">Duplicate Check</th>
+                                    <th class="p-3 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ocr-candidates-tbody" class="divide-y divide-slate-100 dark:divide-slate-700 bg-white dark:bg-slate-800">
+                                <!-- OCR Extracted candidates rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 8: TROUBLESOME & WEAK WORDS -->
+        <section id="view-troublesome" class="view-panel hidden space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Troublesome & Weak Center
+                    </h2>
+                    <p class="text-sm text-slate-500">Targeted revision for words you highlighted or frequently get wrong.</p>
+                </div>
+                <button onclick="startModeQuiz('Troublesome')" class="px-5 py-3 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold rounded-xl shadow transition flex items-center space-x-2">
+                    <i class="fa-solid fa-bolt"></i><span>START WEAK WORD QUIZ</span>
+                </button>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-700 text-slate-500 font-semibold">
+                            <tr>
+                                <th class="p-3.5">Word</th>
+                                <th class="p-3.5">Meaning</th>
+                                <th class="p-3.5">Times Asked</th>
+                                <th class="p-3.5">Accuracy</th>
+                                <th class="p-3.5 text-right">Remove Flag</th>
+                            </tr>
+                        </thead>
+                        <tbody id="troublesome-tbody" class="divide-y divide-slate-100 dark:divide-slate-700">
+                            <!-- Dynamic Troublesome Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 9: PROGRESS ANALYTICS -->
+        <section id="view-analytics" class="view-panel hidden space-y-6">
+            <div>
+                <h2 class="text-2xl font-black text-slate-900 dark:text-white">Progress Analytics</h2>
+                <p class="text-sm text-slate-500">In-depth breakdown of word exposures and revision performance.</p>
+            </div>
+
+            <!-- EXPOSURE DISTRIBUTION METRICS -->
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-4">
+                <h3 class="font-bold text-slate-900 dark:text-white text-lg">Systematic Exposure Levels</h3>
+                <p class="text-xs text-slate-500">Ensuring all words systematically move from 0 exposures up to repeated mastery.</p>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <span class="text-xs text-slate-500 uppercase font-semibold">0 Exposures (Untested)</span>
+                        <p id="exp-0" class="text-2xl font-black text-slate-600 dark:text-slate-300 mt-1">0</p>
+                    </div>
+                    <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <span class="text-xs text-slate-500 uppercase font-semibold">1 Exposure</span>
+                        <p id="exp-1" class="text-2xl font-black text-blue-600 mt-1">0</p>
+                    </div>
+                    <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <span class="text-xs text-slate-500 uppercase font-semibold">2 Exposures</span>
+                        <p id="exp-2" class="text-2xl font-black text-indigo-600 mt-1">0</p>
+                    </div>
+                    <div class="p-4 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <span class="text-xs text-slate-500 uppercase font-semibold">3+ Exposures</span>
+                        <p id="exp-3plus" class="text-2xl font-black text-emerald-600 mt-1">0</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 10: BACKUP & RESTORE -->
+        <section id="view-backup" class="view-panel hidden max-w-2xl mx-auto space-y-6">
+            <div class="bg-white dark:bg-slate-800 rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-slate-700 shadow-md space-y-6">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+                        <i class="fa-solid fa-database text-brand-600"></i> Backup & Restore Data
+                    </h2>
+                    <p class="text-sm text-slate-500">Safely export your vocabulary database or restore from a JSON backup file anytime.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <button onclick="exportBackupJSON()" class="p-6 bg-brand-50 dark:bg-brand-900/20 border-2 border-brand-500 rounded-2xl hover:bg-brand-100 dark:hover:bg-brand-900/40 transition text-left space-y-2">
+                        <i class="fa-solid fa-file-export text-brand-600 text-2xl"></i>
+                        <h4 class="font-extrabold text-slate-900 dark:text-white">EXPORT BACKUP</h4>
+                        <p class="text-xs text-slate-500">Download complete JSON file with words, categories, and quiz history.</p>
+                    </button>
+
+                    <div class="relative p-6 bg-slate-50 dark:bg-slate-900 border-2 border-slate-300 dark:border-slate-700 rounded-2xl hover:border-slate-400 transition text-left space-y-2">
+                        <input type="file" id="import-json-file" accept=".json" class="hidden" onchange="importBackupJSON(event)">
+                        <label for="import-json-file" class="cursor-pointer block space-y-2">
+                            <i class="fa-solid fa-file-import text-indigo-600 text-2xl"></i>
+                            <h4 class="font-extrabold text-slate-900 dark:text-white">IMPORT BACKUP</h4>
+                            <p class="text-xs text-slate-500">Restore or merge vocabulary database from a previous backup file.</p>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-200 dark:border-slate-700 pt-4 flex justify-between items-center">
+                    <div>
+                        <span class="text-xs font-bold text-rose-600">Danger Zone</span>
+                        <p class="text-xs text-slate-500">Clear all words and reset local storage</p>
+                    </div>
+                    <button onclick="wipeDatabase()" class="px-4 py-2 bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 font-bold text-xs rounded-lg hover:bg-rose-200 transition">
+                        Reset All Data
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // APP CONFIG & INDEXEDDB ENGINE
+        const DB_NAME = 'SSCVocabProDB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'vocabulary';
+
+        let db = null;
+        let currentView = 'home';
+        let allWordsCache = [];
+        let filteredWordsBank = [];
+        let currentBankPage = 1;
+        const bankPageSize = 25;
+
+        // ACTIVE QUIZ STATE
+        let activeQuiz = {
+            questions: [],
+            currentIndex: 0,
+            score: 0,
+            startTime: null,
+            timerInterval: null,
+            userAnswers: [],
+            length: 20
+        };
+
+        // SAMPLE TEST DATA FOR OPTIONAL DEMO LOAD
+        const SAMPLE_VOCAB = [
+            { word: "Abate", meaning: "Become less intense or widespread", categories: ["Synonyms", "One Word Substitution"], synonyms: "Subside, diminish, lessen", antonyms: "Intensify, increase", example: "The storm began to abate towards morning.", source: "Blackbook", troublesome: false },
+            { word: "Garrulous", meaning: "Excessively talkative, especially on trivial matters", categories: ["One Word Substitution", "Synonyms"], synonyms: "Loquacious, talkative, verbose", antonyms: "Taciturn, reticent, reserved", example: "The garrulous passenger kept talking all flight.", source: "Blackbook", troublesome: true },
+            { word: "Obsolete", meaning: "No longer produced or used; out of date", categories: ["One Word Substitution"], synonyms: "Outdated, archaic", antonyms: "Modern, current", example: "Handwritten ledgers have become obsolete.", source: "SSC Mock Test", troublesome: false },
+            { word: "Ephemeral", meaning: "Lasting for a very short time", categories: ["One Word Substitution", "Synonyms"], synonyms: "Transient, fleeting", antonyms: "Permanent, eternal", example: "Fame in the digital age is often ephemeral.", source: "Blackbook", troublesome: true },
+            { word: "Abolish", meaning: "Formally put an end to a system, practice, or institution", categories: ["Synonyms"], synonyms: "Nullify, annul", antonyms: "Establish, enact", example: "Slavery was abolished in the 19th century.", source: "Blackbook", troublesome: false },
+            { word: "Brevity", meaning: "Concise and exact use of words in writing or speech", categories: ["One Word Substitution"], synonyms: "Briefness, conciseness", antonyms: "Verbosity, prolixity", example: "The brevity of the speech was appreciated.", source: "SSC Study Material", troublesome: false },
+            { word: "Cacophony", meaning: "A harsh, discordant mixture of sounds", categories: ["One Word Substitution"], synonyms: "Dissonance, racket", antonyms: "Harmony, euphony", example: "A cacophony of car horns filled the street.", source: "Blackbook", troublesome: false },
+            { word: "Diligent", meaning: "Having or showing care and conscientiousness in work", categories: ["Synonyms"], synonyms: "Assiduous, hardworking", antonyms: "Lazy, negligent", example: "She is a diligent student who scores top marks.", source: "Blackbook", troublesome: false },
+            { word: "Fastidious", meaning: "Very attentive to and concerned about accuracy and detail", categories: ["One Word Substitution", "Synonyms"], synonyms: "Meticulous, fussy", antonyms: "Careless, sloppy", example: "He was fastidious about his personal appearance.", source: "Blackbook", troublesome: false },
+            { word: "Gregarious", meaning: "Fond of company; sociable", categories: ["One Word Substitution"], synonyms: "Sociable, outgoing", antonyms: "Reclusive, introverted", example: "Dolphins are gregarious animals.", source: "Blackbook", troublesome: false },
+            { word: "Bite the bullet", meaning: "To face a difficult situation with courage", categories: ["Idioms & Phrases"], synonyms: "Face the music", antonyms: "Evade, shrink back", example: "I decided to bite the bullet and go to the dentist.", source: "Blackbook", troublesome: false },
+            { word: "Burn the midnight oil", meaning: "To work or study late into the night", categories: ["Idioms & Phrases"], synonyms: "Work late", antonyms: "Sleep early", example: "She burned the midnight oil before the SSC exam.", source: "Blackbook", troublesome: false },
+            { word: "Break the ice", meaning: "To do or say something that relieves tension", categories: ["Idioms & Phrases"], synonyms: "Initiate conversation", antonyms: "Maintain silence", example: "He told a joke to break the ice.", source: "Blackbook", troublesome: false },
+            { word: "Accept", meaning: "To receive willingly", categories: ["Homonyms"], synonyms: "Receive", antonyms: "Refuse", example: "He accepted the award graciously.", source: "Manual Entry", troublesome: false },
+            { word: "Except", meaning: "Not including; other than", categories: ["Homonyms"], synonyms: "Excluding", antonyms: "Including", example: "Everyone attended except John.", source: "Manual Entry", troublesome: false }
+        ];
+
+        function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onupgradeneeded = (e) => {
+                    const dbInstance = e.target.result;
+                    if (!dbInstance.objectStoreNames.contains(STORE_NAME)) {
+                        const store = dbInstance.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                        store.createIndex('wordKey', 'wordKey', { unique: true });
+                        store.createIndex('troublesome', 'troublesome', { unique: false });
+                        store.createIndex('learningStatus', 'learningStatus', { unique: false });
+                        store.createIndex('timesAsked', 'timesAsked', { unique: false });
+                    }
+                };
+                request.onsuccess = (e) => {
+                    db = e.target.result;
+                    resolve(db);
+                };
+                request.onerror = (e) => reject(e.target.error);
+            });
+        }
+
+        function getAllWordsDB() {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readonly');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.getAll();
+                request.onsuccess = () => resolve(request.result || []);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        function saveWordDB(wordData) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.put(wordData);
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        function bulkSaveWordsDB(wordsArray) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                wordsArray.forEach(w => store.put(w));
+                transaction.oncomplete = () => resolve();
+                transaction.onerror = () => reject(transaction.error);
+            });
+        }
+
+        function deleteWordDB(id) {
+            return new Promise((resolve, reject) => {
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                const store = transaction.objectStore(STORE_NAME);
+                const request = store.delete(id);
+                request.onsuccess = () => resolve();
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        function createWordObject({
+            id = 'w_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+            word,
+            meaning,
+            categories = [],
+            synonyms = '',
+            antonyms = '',
+            example = '',
+            source = 'Manual Entry',
+            troublesome = false
+        }) {
+            const cleanWord = word.trim();
+            const wordKey = cleanWord.toLowerCase();
+            return {
+                id,
+                word: cleanWord,
+                wordKey,
+                meaning: meaning.trim(),
+                categories: Array.from(new Set(categories.length ? categories : ['One Word Substitution'])),
+                synonyms: synonyms.trim(),
+                antonyms: antonyms.trim(),
+                example: example.trim(),
+                sources: [source],
+                dateAdded: new Date().toISOString(),
+                troublesome: !!troublesome,
+                timesAsked: 0,
+                timesCorrect: 0,
+                timesWrong: 0,
+                accuracy: 0,
+                lastAsked: null,
+                lastCorrect: null,
+                lastWrong: null,
+                learningStatus: 'Untested'
+            };
+        }
+
+        function navigateTo(viewName) {
+            currentView = viewName;
+            document.querySelectorAll('.view-panel').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById('view-' + viewName);
+            if (target) target.classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-brand-50', 'text-brand-600', 'dark:bg-slate-700', 'dark:text-white');
+            });
+            const activeNav = document.getElementById('nav-' + viewName);
+            if (activeNav) activeNav.classList.add('bg-brand-50', 'text-brand-600', 'dark:bg-slate-700', 'dark:text-white');
+
+            refreshDataAndUI();
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const icon = document.getElementById('theme-icon');
+            if (document.documentElement.classList.contains('dark')) {
+                icon.className = 'fa-solid fa-sun text-amber-400 text-lg';
+            } else {
+                icon.className = 'fa-solid fa-moon text-lg';
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            const bgClass = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-rose-600' : 'bg-slate-800';
+            toast.className = `${bgClass} text-white text-xs font-bold px-4 py-3 rounded-xl shadow-xl flex items-center space-x-2 transition-all transform translate-y-2 opacity-0 pointer-events-auto`;
+            toast.innerHTML = `<i class="fa-solid fa-circle-info"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        async function refreshDataAndUI() {
+            allWordsCache = await getAllWordsDB();
+
+            // Update Home Stats
+            const total = allWordsCache.length;
+            const untested = allWordsCache.filter(w => w.timesAsked === 0).length;
+            const tested = total - untested;
+            const weak = allWordsCache.filter(w => w.learningStatus === 'Weak').length;
+            const revision = allWordsCache.filter(w => w.learningStatus === 'Revision').length;
+            const troublesome = allWordsCache.filter(w => w.troublesome).length;
+
+            document.getElementById('stat-total-words').textContent = total;
+            document.getElementById('stat-untested').textContent = untested;
+            document.getElementById('stat-tested').textContent = tested;
+            document.getElementById('stat-weak').textContent = weak;
+            document.getElementById('stat-revision').textContent = revision;
+            document.getElementById('stat-troublesome').textContent = troublesome;
+
+            // Empty banner visibility
+            const emptyBanner = document.getElementById('home-empty-banner');
+            if (total === 0) emptyBanner.classList.remove('hidden');
+            else emptyBanner.classList.add('hidden');
+
+            // Bank Coverage %
+            const coveragePct = total > 0 ? Math.round((tested / total) * 100) : 0;
+            document.getElementById('coverage-percentage').textContent = `${coveragePct}%`;
+            document.getElementById('coverage-bar').style.width = `${coveragePct}%`;
+            document.getElementById('coverage-tested-count').textContent = `${tested} Tested`;
+            document.getElementById('coverage-total-count').textContent = `${total} Total Words`;
+
+            // Overall Accuracy %
+            let totalAskedOverall = 0;
+            let totalCorrectOverall = 0;
+            allWordsCache.forEach(w => {
+                totalAskedOverall += (w.timesAsked || 0);
+                totalCorrectOverall += (w.timesCorrect || 0);
+            });
+            const overallAccPct = totalAskedOverall > 0 ? Math.round((totalCorrectOverall / totalAskedOverall) * 100) : 0;
+            document.getElementById('overall-accuracy-pct').textContent = `${overallAccPct}%`;
+            document.getElementById('accuracy-bar').style.width = `${overallAccPct}%`;
+            document.getElementById('accuracy-correct-stats').textContent = `${totalCorrectOverall} Correct`;
+            document.getElementById('accuracy-total-asked').textContent = `${totalAskedOverall} Questions Attempted`;
+
+            // Category Counts
+            const getCatCount = (cat) => allWordsCache.filter(w => w.categories.includes(cat)).length;
+            document.getElementById('cat-count-ows').textContent = `${getCatCount('One Word Substitution')} words`;
+            document.getElementById('cat-count-idioms').textContent = `${getCatCount('Idioms & Phrases')} words`;
+            document.getElementById('cat-count-synonyms').textContent = `${getCatCount('Synonyms')} words`;
+            document.getElementById('cat-count-antonyms').textContent = `${getCatCount('Antonyms')} words`;
+            document.getElementById('cat-count-homonyms').textContent = `${getCatCount('Homonyms')} words`;
+
+            // Exposure Stats in Analytics
+            document.getElementById('exp-0').textContent = allWordsCache.filter(w => w.timesAsked === 0).length;
+            document.getElementById('exp-1').textContent = allWordsCache.filter(w => w.timesAsked === 1).length;
+            document.getElementById('exp-2').textContent = allWordsCache.filter(w => w.timesAsked === 2).length;
+            document.getElementById('exp-3plus').textContent = allWordsCache.filter(w => w.timesAsked >= 3).length;
+
+            // Render current view content
+            if (currentView === 'word-bank') filterWordBank();
+            if (currentView === 'troublesome') renderTroublesomeTable();
+        }
+
+        async function loadSampleData() {
+            const prepared = SAMPLE_VOCAB.map(w => createWordObject(w));
+            await bulkSaveWordsDB(prepared);
+            showToast('Loaded 15 sample SSC vocabulary words!', 'success');
+            refreshDataAndUI();
+        }
+
+        function checkDuplicateWordLive() {
+            const wordVal = document.getElementById('form-word').value.trim().toLowerCase();
+            const warning = document.getElementById('duplicate-warning');
+            const existing = allWordsCache.find(w => w.wordKey === wordVal);
+            if (existing) {
+                warning.classList.remove('hidden');
+            } else {
+                warning.classList.add('hidden');
+            }
+        }
+
+        async function handleWordSubmit(e) {
+            e.preventDefault();
+            const wordVal = document.getElementById('form-word').value.trim();
+            const meaningVal = document.getElementById('form-meaning').value.trim();
+            if (!wordVal || !meaningVal) return;
+
+            const selectedCats = [];
+            document.querySelectorAll('.cat-checkbox:checked').forEach(cb => selectedCats.push(cb.value));
+            
+            const synonymsVal = document.getElementById('form-synonyms').value;
+            const antonymsVal = document.getElementById('form-antonyms').value;
+            const exampleVal = document.getElementById('form-example').value;
+            const sourceVal = document.getElementById('form-source').value;
+            const troublesomeVal = document.getElementById('form-troublesome').checked;
+
+            const existingWord = allWordsCache.find(w => w.wordKey === wordVal.toLowerCase());
+
+            if (existingWord) {
+                // UPDATE EXISTING MASTER RECORD
+                existingWord.meaning = meaningVal;
+                selectedCats.forEach(c => {
+                    if (!existingWord.categories.includes(c)) existingWord.categories.push(c);
+                });
+                if (synonymsVal) existingWord.synonyms = synonymsVal;
+                if (antonymsVal) existingWord.antonyms = antonymsVal;
+                if (exampleVal) existingWord.example = exampleVal;
+                if (!existingWord.sources.includes(sourceVal)) existingWord.sources.push(sourceVal);
+                existingWord.troublesome = troublesomeVal;
+
+                await saveWordDB(existingWord);
+                showToast(`Updated existing record for "${wordVal}"`, 'success');
+            } else {
+                // CREATE NEW RECORD
+                const newObj = createWordObject({
+                    word: wordVal,
+                    meaning: meaningVal,
+                    categories: selectedCats,
+                    synonyms: synonymsVal,
+                    antonyms: antonymsVal,
+                    example: exampleVal,
+                    source: sourceVal,
+                    troublesome: troublesomeVal
+                });
+                await saveWordDB(newObj);
+                showToast(`Saved "${wordVal}" to vocabulary bank!`, 'success');
+            }
+
+            resetWordForm();
+            refreshDataAndUI();
+        }
+
+        function resetWordForm() {
+            document.getElementById('add-word-form').reset();
+            document.getElementById('duplicate-warning').classList.add('hidden');
+        }
+
+        function filterWordBank() {
+            const query = document.getElementById('bank-search-input').value.toLowerCase().trim();
+            const catFilter = document.getElementById('bank-filter-category').value;
+            const statusFilter = document.getElementById('bank-filter-status').value;
+            const sortBy = document.getElementById('bank-sort-by').value;
+
+            filteredWordsBank = allWordsCache.filter(w => {
+                const matchesSearch = !query || w.word.toLowerCase().includes(query) || w.meaning.toLowerCase().includes(query) || w.synonyms.toLowerCase().includes(query);
+                const matchesCat = catFilter === 'ALL' || w.categories.includes(catFilter);
+                
+                let matchesStatus = true;
+                if (statusFilter === 'Troublesome') matchesStatus = w.troublesome;
+                else if (statusFilter !== 'ALL') matchesStatus = w.learningStatus === statusFilter;
+
+                return matchesSearch && matchesCat && matchesStatus;
+            });
+
+            // Sorting
+            filteredWordsBank.sort((a, b) => {
+                if (sortBy === 'alpha-asc') return a.word.localeCompare(b.word);
+                if (sortBy === 'alpha-desc') return b.word.localeCompare(a.word);
+                if (sortBy === 'date-desc') return new Date(b.dateAdded) - new Date(a.dateAdded);
+                if (sortBy === 'times-asc') return a.timesAsked - b.timesAsked;
+                if (sortBy === 'accuracy-asc') return a.accuracy - b.accuracy;
+                return 0;
+            });
+
+            currentBankPage = 1;
+            renderWordBankTable();
+        }
+
+        function renderWordBankTable() {
+            const tbody = document.getElementById('word-bank-tbody');
+            tbody.innerHTML = '';
+
+            const startIdx = (currentBankPage - 1) * bankPageSize;
+            const pageData = filteredWordsBank.slice(startIdx, startIdx + bankPageSize);
+
+            if (pageData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">No words found matching the active filters.</td></tr>`;
+            } else {
+                pageData.forEach(w => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50 dark:hover:bg-slate-700/50 transition';
+                    tr.innerHTML = `
+                        <td class="p-3.5 font-bold text-slate-900 dark:text-white">
+                            ${w.word}
+                            ${w.troublesome ? '<i class="fa-solid fa-triangle-exclamation text-amber-500 ml-1" title="Troublesome"></i>' : ''}
+                        </td>
+                        <td class="p-3.5 text-slate-600 dark:text-slate-300 max-w-xs truncate">${w.meaning}</td>
+                        <td class="p-3.5">
+                            <div class="flex flex-wrap gap-1">
+                                ${w.categories.map(c => `<span class="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded text-[10px] font-semibold">${c}</span>`).join('')}
+                            </div>
+                        </td>
+                        <td class="p-3.5 text-xs text-slate-500 font-medium">
+                            ${w.timesAsked} asked / <span class="${w.accuracy >= 70 ? 'text-emerald-600' : 'text-amber-600'} font-bold">${w.accuracy}%</span>
+                        </td>
+                        <td class="p-3.5">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-bold ${getStatusBadgeClass(w.learningStatus)}">${w.learningStatus}</span>
+                        </td>
+                        <td class="p-3.5 text-right space-x-2">
+                            <button onclick="toggleTroublesomeFlag('${w.id}')" class="text-xs p-1.5 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-amber-500" title="Toggle Troublesome Flag">
+                                <i class="fa-${w.troublesome ? 'solid' : 'regular'} fa-star"></i>
+                            </button>
+                            <button onclick="deleteWord('${w.id}')" class="text-xs p-1.5 rounded hover:bg-slate-200 dark:hover:bg-slate-700 text-rose-500" title="Delete Word">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            document.getElementById('bank-count-info').textContent = `Showing ${pageData.length} of ${filteredWordsBank.length} words`;
+            document.getElementById('bank-prev-btn').disabled = currentBankPage === 1;
+            document.getElementById('bank-next-btn').disabled = startIdx + bankPageSize >= filteredWordsBank.length;
+        }
+
+        function getStatusBadgeClass(status) {
+            switch(status) {
+                case 'Untested': return 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300';
+                case 'Good': return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300';
+                case 'Weak': return 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300';
+                case 'Revision': return 'bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300';
+                default: return 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300';
+            }
+        }
+
+        function changeBankPage(delta) {
+            currentBankPage += delta;
+            renderWordBankTable();
+        }
+
+        async function toggleTroublesomeFlag(id) {
+            const wordObj = allWordsCache.find(w => w.id === id);
+            if (wordObj) {
+                wordObj.troublesome = !wordObj.troublesome;
+                await saveWordDB(wordObj);
+                refreshDataAndUI();
+            }
+        }
+
+        async function deleteWord(id) {
+            if (confirm("Are you sure you want to delete this word?")) {
+                await deleteWordDB(id);
+                showToast("Word deleted", "info");
+                refreshDataAndUI();
+            }
+        }
+
+        function renderTroublesomeTable() {
+            const tbody = document.getElementById('troublesome-tbody');
+            tbody.innerHTML = '';
+
+            const list = allWordsCache.filter(w => w.troublesome || w.learningStatus === 'Weak');
+            if (list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400">No troublesome or weak words flagged.</td></tr>`;
+            } else {
+                list.forEach(w => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50 dark:hover:bg-slate-700/50 transition';
+                    tr.innerHTML = `
+                        <td class="p-3.5 font-bold text-slate-900 dark:text-white">${w.word}</td>
+                        <td class="p-3.5 text-slate-600 dark:text-slate-300">${w.meaning}</td>
+                        <td class="p-3.5 text-xs text-slate-500 font-bold">${w.timesAsked} times</td>
+                        <td class="p-3.5 text-xs font-bold ${w.accuracy >= 70 ? 'text-emerald-600' : 'text-rose-600'}">${w.accuracy}%</td>
+                        <td class="p-3.5 text-right">
+                            <button onclick="toggleTroublesomeFlag('${w.id}')" class="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded hover:bg-amber-200">
+                                Unflag
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+        }
+
+        function startQuickQuiz(len = 20) {
+            document.getElementById('quiz-mode-select').value = 'All Vocabulary';
+            setQuizLength(len);
+            startConfiguredQuiz();
+        }
+
+        function startCategoryQuiz(catName) {
+            document.getElementById('quiz-mode-select').value = catName;
+            setQuizLength(20);
+            startConfiguredQuiz();
+        }
+
+        function startModeQuiz(modeName) {
+            document.getElementById('quiz-mode-select').value = modeName;
+            setQuizLength(20);
+            startConfiguredQuiz();
+        }
+
+        function setQuizLength(len) {
+            activeQuiz.length = len;
+            document.querySelectorAll('.quiz-len-btn').forEach(b => {
+                b.className = 'quiz-len-btn py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 text-sm font-bold hover:bg-slate-100 dark:hover:bg-slate-700';
+                if (parseInt(b.textContent) === len) {
+                    b.className = 'quiz-len-btn py-2.5 rounded-xl border-2 border-brand-500 bg-brand-50 dark:bg-brand-900/30 text-brand-700 dark:text-brand-300 text-sm font-bold';
+                }
+            });
+        }
+
+        function startConfiguredQuiz() {
+            if (allWordsCache.length === 0) {
+                showToast("Please add vocabulary words before starting a quiz!", "error");
+                return;
+            }
+
+            const mode = document.getElementById('quiz-mode-select').value;
+            let candidatePool = [...allWordsCache];
+
+            // Filter pool by category/mode
+            if (mode === 'Untested') {
+                candidatePool = candidatePool.filter(w => w.timesAsked === 0);
+            } else if (mode === 'Weak Words') {
+                candidatePool = candidatePool.filter(w => w.learningStatus === 'Weak');
+            } else if (mode === 'Troublesome') {
+                candidatePool = candidatePool.filter(w => w.troublesome);
+            } else if (mode === 'Revision') {
+                candidatePool = candidatePool.filter(w => w.learningStatus === 'Revision' || w.learningStatus === 'Good');
+            } else if (['One Word Substitution', 'Idioms & Phrases', 'Synonyms', 'Antonyms', 'Homonyms'].includes(mode)) {
+                candidatePool = candidatePool.filter(w => w.categories.includes(mode));
+            }
+
+            if (candidatePool.length === 0) {
+                showToast(`No words available for selected mode: ${mode}`, "error");
+                return;
+            }
+
+            /* 
+               CRITICAL SYSTEMIC SELECTION PRIORITY ALGORITHM:
+               Priority 1: Never-tested words (timesAsked === 0)
+               Priority 2: Least-tested words (lowest timesAsked)
+               Priority 3: Previously wrong / Weak / Troublesome words
+               Priority 4: Spaced revision for strong words
+            */
+            candidatePool.sort((a, b) => {
+                // Priority 1: Never tested
+                if (a.timesAsked === 0 && b.timesAsked !== 0) return -1;
+                if (b.timesAsked === 0 && a.timesAsked !== 0) return 1;
+
+                // Priority 2: Lowest timesAsked
+                if (a.timesAsked !== b.timesAsked) return a.timesAsked - b.timesAsked;
+
+                // Priority 3: Troublesome / Weak
+                const aPriority = (a.troublesome ? 2 : 0) + (a.learningStatus === 'Weak' ? 2 : 0);
+                const bPriority = (b.troublesome ? 2 : 0) + (b.learningStatus === 'Weak' ? 2 : 0);
+                if (aPriority !== bPriority) return bPriority - aPriority;
+
+                // Priority 4: Lowest accuracy
+                return a.accuracy - b.accuracy;
+            });
+
+            // Select top N candidates based on requested quiz length
+            const selectedWords = candidatePool.slice(0, activeQuiz.length);
+
+            // Generate dynamic questions with distractors
+            activeQuiz.questions = selectedWords.map(w => generateQuestionObject(w, allWordsCache));
+            activeQuiz.currentIndex = 0;
+            activeQuiz.score = 0;
+            activeQuiz.userAnswers = [];
+            activeQuiz.startTime = Date.now();
+
+            // Switch view
+            navigateTo('quiz-active');
+            startQuizTimer();
+            renderCurrentQuestion();
+        }
+
+        function generateQuestionObject(targetWord, fullBank) {
+            // Types: 'word-to-meaning', 'meaning-to-word', 'synonym-to-word'
+            const qTypes = ['word-to-meaning', 'meaning-to-word'];
+            if (targetWord.synonyms) qTypes.push('word-to-synonym');
+            const chosenType = qTypes[Math.floor(Math.random() * qTypes.length)];
+
+            let promptText = '';
+            let promptTypeLabel = '';
+            let correctAnswer = '';
+
+            if (chosenType === 'word-to-meaning') {
+                promptTypeLabel = 'Word → Meaning';
+                promptText = targetWord.word;
+                correctAnswer = targetWord.meaning;
+            } else if (chosenType === 'meaning-to-word') {
+                promptTypeLabel = 'Meaning → Word';
+                promptText = targetWord.meaning;
+                correctAnswer = targetWord.word;
+            } else {
+                promptTypeLabel = 'Word → Synonym';
+                promptText = targetWord.word;
+                correctAnswer = targetWord.synonyms.split(',')[0].trim();
+            }
+
+            // Pick 3 distractors from fullBank
+            const distractorPool = fullBank.filter(w => w.id !== targetWord.id);
+            shuffleArray(distractorPool);
+
+            const options = [correctAnswer];
+            for (let i = 0; i < distractorPool.length && options.length < 4; i++) {
+                const distItem = distractorPool[i];
+                let distVal = chosenType === 'meaning-to-word' ? distItem.word : distItem.meaning;
+                if (!options.includes(distVal)) options.push(distVal);
+            }
+
+            // Fallback options if database has fewer than 4 total words
+            const fallbackDistractors = ["To make something clear", "Occurring once every year", "Extremely harsh or severe", "A state of temporary disuse"];
+            while (options.length < 4) {
+                const fb = fallbackDistractors.pop();
+                if (!options.includes(fb)) options.push(fb);
+            }
+
+            shuffleArray(options);
+
+            return {
+                wordObj: targetWord,
+                type: chosenType,
+                typeLabel: promptTypeLabel,
+                promptText,
+                correctAnswer,
+                options
+            };
+        }
+
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+        }
+
+        function startQuizTimer() {
+            if (activeQuiz.timerInterval) clearInterval(activeQuiz.timerInterval);
+            const timerEl = document.getElementById('quiz-timer');
+            activeQuiz.timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - activeQuiz.startTime) / 1000);
+                const mins = String(Math.floor(elapsed / 60)).padStart(2, '0');
+                const secs = String(elapsed % 60).padStart(2, '0');
+                timerEl.innerHTML = `<i class="fa-regular fa-clock mr-1"></i>${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function renderCurrentQuestion() {
+            const q = activeQuiz.questions[activeQuiz.currentIndex];
+            document.getElementById('quiz-progress-text').textContent = `Question ${activeQuiz.currentIndex + 1} of ${activeQuiz.questions.length}`;
+            document.getElementById('quiz-category-tag').textContent = q.wordObj.categories[0] || 'VOCAB';
+            document.getElementById('quiz-progress-bar').style.width = `${((activeQuiz.currentIndex) / activeQuiz.questions.length) * 100}%`;
+
+            document.getElementById('question-prompt-type').textContent = q.typeLabel;
+            document.getElementById('question-prompt-text').textContent = q.promptText;
+
+            const container = document.getElementById('quiz-options-container');
+            container.innerHTML = '';
+
+            const feedbackBox = document.getElementById('quiz-feedback-box');
+            feedbackBox.className = 'hidden p-4 rounded-xl border';
+            document.getElementById('quiz-next-btn').classList.add('hidden');
+
+            q.options.forEach((optText, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full p-4 text-left rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 hover:border-brand-500 hover:bg-brand-50/50 dark:hover:bg-slate-800 transition flex items-center justify-between font-medium text-slate-800 dark:text-slate-100 option-btn';
+                btn.onclick = () => submitQuizAnswer(optText, btn);
+                btn.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <span class="w-7 h-7 rounded-lg bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-600 dark:text-slate-300">${String.fromCharCode(65 + idx)}</span>
+                        <span>${optText}</span>
+                    </div>
+                    <i class="fa-regular fa-circle text-slate-400"></i>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function submitQuizAnswer(selectedOption, clickedBtn) {
+            // Disable all option buttons
+            document.querySelectorAll('.option-btn').forEach(b => b.onclick = null);
+
+            const q = activeQuiz.questions[activeQuiz.currentIndex];
+            const isCorrect = selectedOption === q.correctAnswer;
+
+            if (isCorrect) {
+                activeQuiz.score++;
+                clickedBtn.className = 'w-full p-4 text-left rounded-xl border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-900 dark:text-emerald-200 font-bold flex items-center justify-between';
+                clickedBtn.querySelector('i').className = 'fa-solid fa-circle-check text-emerald-600 text-lg';
+            } else {
+                clickedBtn.className = 'w-full p-4 text-left rounded-xl border-2 border-rose-500 bg-rose-50 dark:bg-rose-900/30 text-rose-900 dark:text-rose-200 font-bold flex items-center justify-between';
+                clickedBtn.querySelector('i').className = 'fa-solid fa-circle-xmark text-rose-600 text-lg';
+
+                // Highlight correct option
+                document.querySelectorAll('.option-btn').forEach(b => {
+                    if (b.textContent.includes(q.correctAnswer)) {
+                        b.className = 'w-full p-4 text-left rounded-xl border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-900 dark:text-emerald-200 font-bold flex items-center justify-between';
+                    }
+                });
+            }
+
+            activeQuiz.userAnswers.push({
+                question: q,
+                userAnswer: selectedOption,
+                isCorrect
+            });
+
+            // Feedback box with full details
+            const feedbackBox = document.getElementById('quiz-feedback-box');
+            feedbackBox.classList.remove('hidden');
+            feedbackBox.className = `p-4 rounded-xl border ${isCorrect ? 'bg-emerald-50 border-emerald-200 text-emerald-900 dark:bg-emerald-900/20 dark:border-emerald-800 dark:text-emerald-200' : 'bg-rose-50 border-rose-200 text-rose-900 dark:bg-rose-900/20 dark:border-rose-800 dark:text-rose-200'}`;
+            feedbackBox.innerHTML = `
+                <h4 class="font-bold text-sm mb-1">${isCorrect ? 'Correct Answer!' : 'Incorrect'}</h4>
+                <p class="text-xs"><strong>Word:</strong> ${q.wordObj.word} — <strong>Meaning:</strong> ${q.wordObj.meaning}</p>
+                ${q.wordObj.example ? `<p class="text-xs italic mt-1">"${q.wordObj.example}"</p>` : ''}
+            `;
+
+            document.getElementById('quiz-next-btn').classList.remove('hidden');
+        }
+
+        function nextQuizQuestion() {
+            activeQuiz.currentIndex++;
+            if (activeQuiz.currentIndex < activeQuiz.questions.length) {
+                renderCurrentQuestion();
+            } else {
+                finishQuizSession();
+            }
+        }
+
+        function abortQuiz() {
+            if (confirm("Are you sure you want to exit the current quiz?")) {
+                clearInterval(activeQuiz.timerInterval);
+                navigateTo('home');
+            }
+        }
+
+        async function finishQuizSession() {
+            clearInterval(activeQuiz.timerInterval);
+            const totalElapsed = Math.floor((Date.now() - activeQuiz.startTime) / 1000);
+            const mins = String(Math.floor(totalElapsed / 60)).padStart(2, '0');
+            const secs = String(totalElapsed % 60).padStart(2, '0');
+
+            // UPDATE WORD STATISTICS IN INDEXEDDB
+            for (const item of activeQuiz.userAnswers) {
+                const word = item.question.wordObj;
+                word.timesAsked = (word.timesAsked || 0) + 1;
+                word.lastAsked = new Date().toISOString();
+
+                if (item.isCorrect) {
+                    word.timesCorrect = (word.timesCorrect || 0) + 1;
+                    word.lastCorrect = new Date().toISOString();
+                } else {
+                    word.timesWrong = (word.timesWrong || 0) + 1;
+                    word.lastWrong = new Date().toISOString();
+                }
+
+                word.accuracy = Math.round((word.timesCorrect / word.timesAsked) * 100);
+
+                // Update Learning Status
+                if (word.accuracy < 50) word.learningStatus = 'Weak';
+                else if (word.timesAsked >= 3 && word.accuracy >= 80) word.learningStatus = 'Good';
+                else if (word.accuracy < 80) word.learningStatus = 'Revision';
+                else word.learningStatus = 'Learning';
+
+                await saveWordDB(word);
+            }
+
+            // Render Results Screen
+            document.getElementById('result-score').textContent = `${activeQuiz.score}/${activeQuiz.questions.length}`;
+            const pct = Math.round((activeQuiz.score / activeQuiz.questions.length) * 100);
+            document.getElementById('result-accuracy').textContent = `${pct}%`;
+            document.getElementById('result-time').textContent = `${mins}:${secs}`;
+            document.getElementById('result-attempted').textContent = activeQuiz.questions.length;
+
+            const reviewTbody = document.getElementById('result-review-tbody');
+            reviewTbody.innerHTML = '';
+            activeQuiz.userAnswers.forEach(ans => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-3">
+                        ${ans.isCorrect ? '<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check"></i> Correct</span>' : '<span class="text-rose-600 font-bold"><i class="fa-solid fa-xmark"></i> Wrong</span>'}
+                    </td>
+                    <td class="p-3 font-bold">${ans.question.wordObj.word}</td>
+                    <td class="p-3 text-slate-500">${ans.userAnswer}</td>
+                    <td class="p-3 text-slate-800 dark:text-slate-200 font-medium">${ans.question.correctAnswer}</td>
+                `;
+                reviewTbody.appendChild(tr);
+            });
+
+            if (pct >= 80 && typeof confetti === 'function') {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }
+
+            navigateTo('quiz-result');
+        }
+
+        let ocrCandidates = [];
+
+        async function handleImageSelection(e) {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+
+            const progressBox = document.getElementById('ocr-progress-box');
+            const progressBar = document.getElementById('ocr-progress-bar');
+            const statusText = document.getElementById('ocr-status-text');
+            const pctText = document.getElementById('ocr-percentage');
+
+            progressBox.classList.remove('hidden');
+            ocrCandidates = [];
+
+            try {
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    statusText.textContent = `Processing image ${i + 1} of ${files.length}...`;
+
+                    const result = await Tesseract.recognize(file, 'eng', {
+                        logger: m => {
+                            if (m.status === 'recognizing text') {
+                                const p = Math.round(m.progress * 100);
+                                progressBar.style.width = `${p}%`;
+                                pctText.textContent = `${p}%`;
+                            }
+                        }
+                    });
+
+                    parseOcrTextToCandidates(result.data.text);
+                }
+
+                statusText.textContent = 'OCR Extraction Complete!';
+                renderOcrCandidatesTable();
+            } catch (err) {
+                console.error("OCR Error:", err);
+                showToast("Failed to process image OCR. Please try again.", "error");
+            } finally {
+                progressBox.classList.add('hidden');
+            }
+        }
+
+        function parseOcrTextToCandidates(rawText) {
+            const lines = rawText.split('\n');
+            lines.forEach(line => {
+                const cleaned = line.trim();
+                if (cleaned.length < 5) return;
+
+                // Split on dash, colon, or multiple spaces
+                let parts = cleaned.split(/[-–—:]/);
+                if (parts.length >= 2) {
+                    const word = parts[0].trim().replace(/[^a-zA-Z\s]/g, '');
+                    const meaning = parts.slice(1).join(' ').trim();
+
+                    if (word.length >= 2 && meaning.length >= 3) {
+                        const existing = allWordsCache.find(w => w.wordKey === word.toLowerCase());
+                        ocrCandidates.push({
+                            id: 'ocr_' + Math.random().toString(36).substr(2, 5),
+                            word,
+                            meaning,
+                            isDuplicate: !!existing,
+                            confidence: word.length > 3 ? 'High Confidence' : 'Needs Review'
+                        });
+                    }
+                }
+            });
+        }
+
+        function renderOcrCandidatesTable() {
+            const container = document.getElementById('ocr-results-container');
+            const tbody = document.getElementById('ocr-candidates-tbody');
+            tbody.innerHTML = '';
+
+            document.getElementById('ocr-candidates-count').textContent = ocrCandidates.length;
+
+            if (ocrCandidates.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-400">No clear vocabulary pairs detected. Try a clearer image.</td></tr>`;
+            } else {
+                ocrCandidates.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50 dark:hover:bg-slate-700/50 transition';
+                    tr.innerHTML = `
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${item.confidence === 'High Confidence' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                                ${item.confidence}
+                            </span>
+                        </td>
+                        <td class="p-3 font-bold"><input type="text" value="${item.word}" onchange="updateOcrCandidate('${item.id}', 'word', this.value)" class="w-full bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none"></td>
+                        <td class="p-3"><input type="text" value="${item.meaning}" onchange="updateOcrCandidate('${item.id}', 'meaning', this.value)" class="w-full bg-transparent border-b border-slate-300 dark:border-slate-600 focus:outline-none"></td>
+                        <td class="p-3">
+                            ${item.isDuplicate ? '<span class="text-xs font-bold text-amber-600"><i class="fa-solid fa-triangle-exclamation"></i> Already Exists</span>' : '<span class="text-xs font-bold text-emerald-600">New Word</span>'}
+                        </td>
+                        <td class="p-3 text-right">
+                            <button onclick="acceptSingleOcrCandidate('${item.id}')" class="px-3 py-1 bg-brand-600 text-white text-xs font-bold rounded shadow hover:bg-brand-700">Add</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            container.classList.remove('hidden');
+        }
+
+        function updateOcrCandidate(id, field, val) {
+            const cand = ocrCandidates.find(c => c.id === id);
+            if (cand) cand[field] = val;
+        }
+
+        async function acceptSingleOcrCandidate(id) {
+            const cand = ocrCandidates.find(c => c.id === id);
+            if (!cand) return;
+
+            const existing = allWordsCache.find(w => w.wordKey === cand.word.toLowerCase());
+            if (existing) {
+                existing.meaning = cand.meaning;
+                await saveWordDB(existing);
+                showToast(`Merged "${cand.word}" with existing entry!`, 'success');
+            } else {
+                const newObj = createWordObject({ word: cand.word, meaning: cand.meaning, source: 'Blackbook' });
+                await saveWordDB(newObj);
+                showToast(`Added "${cand.word}" to Vocabulary!`, 'success');
+            }
+
+            ocrCandidates = ocrCandidates.filter(c => c.id !== id);
+            renderOcrCandidatesTable();
+            refreshDataAndUI();
+        }
+
+        async function acceptAllOcrCandidates() {
+            for (const cand of ocrCandidates) {
+                const existing = allWordsCache.find(w => w.wordKey === cand.word.toLowerCase());
+                if (existing) {
+                    existing.meaning = cand.meaning;
+                    await saveWordDB(existing);
+                } else {
+                    const newObj = createWordObject({ word: cand.word, meaning: cand.meaning, source: 'Blackbook' });
+                    await saveWordDB(newObj);
+                }
+            }
+
+            showToast(`Accepted and imported ${ocrCandidates.length} entries!`, 'success');
+            ocrCandidates = [];
+            renderOcrCandidatesTable();
+            refreshDataAndUI();
+        }
+
+        function exportBackupJSON() {
+            const backupData = {
+                exportDate: new Date().toISOString(),
+                version: DB_VERSION,
+                totalWords: allWordsCache.length,
+                words: allWordsCache
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", `SSC_Vocab_Backup_${new Date().toISOString().slice(0,10)}.json`);
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.remove();
+
+            showToast("Backup exported successfully!", "success");
+        }
+
+        function importBackupJSON(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async (event) => {
+                try {
+                    const parsed = JSON.parse(event.target.result);
+                    if (parsed && Array.isArray(parsed.words)) {
+                        await bulkSaveWordsDB(parsed.words);
+                        showToast(`Successfully imported ${parsed.words.length} vocabulary words!`, "success");
+                        refreshDataAndUI();
+                    } else {
+                        showToast("Invalid backup file format.", "error");
+                    }
+                } catch (err) {
+                    console.error("Import error:", err);
+                    showToast("Error parsing JSON backup file.", "error");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        async function wipeDatabase() {
+            if (confirm("DANGER: Are you sure you want to erase ALL vocabulary entries? Make sure you have exported a backup first!")) {
+                const transaction = db.transaction([STORE_NAME], 'readwrite');
+                transaction.objectStore(STORE_NAME).clear();
+                transaction.oncomplete = () => {
+                    showToast("Database wiped clean.", "info");
+                    refreshDataAndUI();
+                };
+            }
+        }
+
+        window.onload = async function() {
+            await initDB();
+            await refreshDataAndUI();
+        };
+    </script>
+</body>
+</html>
