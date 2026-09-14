@@ -1,0 +1,134 @@
+name: Final index fix
+on:
+  push:
+    branches: [main]
+jobs:
+  fix:
+    if: github.event.head_commit.message != 'Apply final index fixes'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply exact requested changes
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path('index.html')
+          s = p.read_text()
+
+          # Remove only the trailing monochrome interaction palette block.
+          s = re.sub(r'\s*<style id="monochrome-interaction-palette">.*?</style>\s*$', '\\n', s, flags=re.S)
+          if '</html>' not in s or 'monochrome-interaction-palette' in s:
+              raise SystemExit('Trailing palette cleanup failed')
+          if s.rstrip().endswith('</html>') is False:
+              raise SystemExit('index.html does not end at </html>')
+
+          # Replace only generateQuestionObject, preserving everything else.
+          new_func = '''        function generateQuestionObject(targetWord, fullBank) {
+            // Types: 'word-to-meaning', 'meaning-to-word', 'word-to-synonym'
+            const qTypes = ['word-to-meaning', 'meaning-to-word'];
+            if (targetWord.synonyms) qTypes.push('word-to-synonym');
+            const chosenType = qTypes[Math.floor(Math.random() * qTypes.length)];
+
+            let promptText = '';
+            let promptTypeLabel = '';
+            let correctAnswer = '';
+
+            if (chosenType === 'word-to-meaning') {
+                promptTypeLabel = 'Word → Meaning';
+                promptText = targetWord.word;
+                correctAnswer = targetWord.meaning;
+            } else if (chosenType === 'meaning-to-word') {
+                promptTypeLabel = 'Meaning → Word';
+                promptText = targetWord.meaning;
+                correctAnswer = targetWord.word;
+            } else {
+                promptTypeLabel = 'Word → Synonym';
+                promptText = targetWord.word;
+                correctAnswer = targetWord.synonyms.split(',')[0].trim();
+            }
+
+            // Terms related to the target word (itself + its synonyms/antonyms) so we
+            // never accidentally offer a second option that is also arguably correct.
+            const norm = s => String(s || '').trim().toLowerCase();
+            const relatedTerms = new Set([norm(targetWord.word)]);
+            (targetWord.synonyms || '').split(',').forEach(s => { if (norm(s)) relatedTerms.add(norm(s)); });
+            (targetWord.antonyms || '').split(',').forEach(s => { if (norm(s)) relatedTerms.add(norm(s)); });
+
+            const isSafeDistractor = (distItem, distVal) => {
+                if (!distVal) return false;
+                if (relatedTerms.has(norm(distVal))) return false;
+                if (relatedTerms.has(norm(distItem.word))) return false;
+                const candSynonyms = (distItem.synonyms || '').split(',').map(norm);
+                if (candSynonyms.includes(norm(targetWord.word))) return false;
+                const candAntonyms = (distItem.antonyms || '').split(',').map(norm);
+                if (candAntonyms.includes(norm(targetWord.word))) return false;
+                return true;
+            };
+
+            // Prefer distractors from the SAME category first (more plausible / harder),
+            // fall back to the rest of the bank only if there aren't enough safe ones.
+            const sameCategory = fullBank.filter(w => w.id !== targetWord.id && targetWord.categories?.some(c => w.categories?.includes(c)));
+            const restOfBank = fullBank.filter(w => w.id !== targetWord.id && !sameCategory.includes(w));
+            shuffleArray(sameCategory);
+            shuffleArray(restOfBank);
+            const distractorPool = [...sameCategory, ...restOfBank];
+
+            const pickDistractorValue = (distItem) => {
+                if (chosenType === 'meaning-to-word') return distItem.word;
+                if (chosenType === 'word-to-synonym') {
+                    // Keep distractors the same "shape" as the answer (a single word),
+                    // so the real answer can't be spotted just by being the only short option.
+                    const syn = (distItem.synonyms || '').split(',')[0].trim();
+                    return syn || distItem.word;
+                }
+                return distItem.meaning;
+            };
+
+            const options = [correctAnswer];
+            for (let i = 0; i < distractorPool.length && options.length < 4; i++) {
+                const distItem = distractorPool[i];
+                const distVal = pickDistractorValue(distItem);
+                if (!isSafeDistractor(distItem, distVal)) continue;
+                if (!options.some(o => norm(o) === norm(distVal))) options.push(distVal);
+            }
+
+            // Fallback options only if the bank is too small / too depleted of safe distractors
+            const fallbackDistractors = ["To make something clear", "Occurring once every year", "Extremely harsh or severe", "A state of temporary disuse"];
+            while (options.length < 4) {
+                const fb = fallbackDistractors.pop();
+                if (!fb) break;
+                if (!options.some(o => norm(o) === norm(fb))) options.push(fb);
+            }
+
+            shuffleArray(options);
+
+            return {
+                wordObj: targetWord,
+                type: chosenType,
+                typeLabel: promptTypeLabel,
+                promptText,
+                correctAnswer,
+                options
+            };
+        }'''
+
+          pattern = r'(?ms)^\s*function generateQuestionObject\(targetWord, fullBank\)\s*\{.*?^\s*\}\s*(?=\n\s*(?:function|const|let|var|window\.|document\.|//|/\*|$))'
+          m = re.search(pattern, s)
+          if not m:
+              raise SystemExit('generateQuestionObject function not found')
+          s = s[:m.start()] + '\n' + new_func + '\n' + s[m.end():]
+          if not all(x in s for x in ['function generateQuestionObject(targetWord, fullBank)', 'isSafeDistractor', 'relatedTerms', 'sameCategory', 'restOfBank']):
+              raise SystemExit('Function verification failed')
+          p.write_text(s)
+          PY
+      - name: Commit final fixes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --check
+          git commit -m 'Apply final index fixes'
+          git push
