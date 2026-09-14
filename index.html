@@ -995,7 +995,7 @@
             const total = allWordsCache.length;
             const untested = allWordsCache.filter(w => w.timesAsked === 0).length;
             const tested = total - untested;
-            const weak = allWordsCache.filter(w => w.learningStatus === 'Weak').length;
+            const weak = allWordsCache.filter(w => (w.timesWrong || 0) > 0 && (w.accuracy || 0) < 90).length;
             const revision = allWordsCache.filter(w => w.learningStatus === 'Revision').length;
             const troublesome = allWordsCache.filter(w => w.troublesome).length;
 
@@ -1239,7 +1239,7 @@
             const tbody = document.getElementById('troublesome-tbody');
             tbody.innerHTML = '';
 
-            const list = allWordsCache.filter(w => w.troublesome || w.learningStatus === 'Weak');
+            const list = allWordsCache.filter(w => w.troublesome || ((w.timesWrong || 0) > 0 && (w.accuracy || 0) < 90));
             if (list.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400">No troublesome or weak words flagged.</td></tr>`;
             } else {
@@ -1251,7 +1251,7 @@
               <td class="p-3.5 text-slate-600 dark:text-slate-300">${w.meaning}</td>
               <td class="p-3.5 text-xs">
                   ${w.troublesome ? '<span class="px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-bold mr-1">Flagged</span>' : ''}
-                  ${w.learningStatus === 'Weak' ? '<span class="px-2 py-0.5 rounded bg-rose-100 text-rose-700 font-bold">Weak (accuracy)</span>' : ''}
+                  ${((w.timesWrong || 0) > 0 && (w.accuracy || 0) < 90) ? '<span class="px-2 py-0.5 rounded bg-rose-100 text-rose-700 font-bold">Weak (accuracy)</span>' : ''}
               </td>
               <td class="p-3.5 text-xs text-slate-500 font-bold">${w.timesAsked} times</td>
               <td class="p-3.5 text-xs font-bold ${w.accuracy >= 70 ? 'text-emerald-600' : 'text-rose-600'}">${w.accuracy}%</td>
@@ -1307,7 +1307,7 @@
             if (mode === 'Untested') {
                 candidatePool = candidatePool.filter(w => w.timesAsked === 0);
             } else if (mode === 'Weak Words') {
-                candidatePool = candidatePool.filter(w => w.learningStatus === 'Weak');
+                candidatePool = candidatePool.filter(w => (w.timesWrong || 0) > 0 && (w.accuracy || 0) < 90);
             } else if (mode === 'Troublesome') {
                 candidatePool = candidatePool.filter(w => w.troublesome);
             } else if (mode === 'Revision') {
@@ -1579,7 +1579,7 @@
                 word.accuracy = Math.round((word.timesCorrect / word.timesAsked) * 100);
 
                 // Update Learning Status
-                if (word.accuracy < 90) word.learningStatus = 'Weak';
+                if ((word.timesWrong || 0) > 0 && word.accuracy < 90) word.learningStatus = 'Weak';
                 else if (word.timesAsked >= 3 && word.accuracy >= 80) word.learningStatus = 'Good';
                 else if (word.accuracy < 80) word.learningStatus = 'Revision';
                 else word.learningStatus = 'Learning';
