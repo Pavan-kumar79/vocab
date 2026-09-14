@@ -1024,7 +1024,7 @@
                 totalAskedOverall += (w.timesAsked || 0);
                 totalCorrectOverall += (w.timesCorrect || 0);
             });
-            const overallAccPct = totalAskedOverall > 0 ? Math.round((totalCorrectOverall / totalAskedOverall) * 100) : 0;
+            const overallAccPct = totalAskedOverall > 0 ? Math.round((totalCorrectOverall / totalAskedOverall) * 1000) / 10 : 0;
             document.getElementById('overall-accuracy-pct').textContent = `${overallAccPct}%`;
             document.getElementById('accuracy-bar').style.width = `${overallAccPct}%`;
             document.getElementById('accuracy-correct-stats').textContent = `${totalCorrectOverall} Correct`;
@@ -1574,7 +1574,7 @@
                 word.accuracy = Math.round((word.timesCorrect / word.timesAsked) * 100);
 
                 // Update Learning Status
-                if (word.accuracy < 50) word.learningStatus = 'Weak';
+                if (word.accuracy < 90) word.learningStatus = 'Weak';
                 else if (word.timesAsked >= 3 && word.accuracy >= 80) word.learningStatus = 'Good';
                 else if (word.accuracy < 80) word.learningStatus = 'Revision';
                 else word.learningStatus = 'Learning';
