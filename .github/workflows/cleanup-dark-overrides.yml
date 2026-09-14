@@ -1,6 +1,7 @@
 name: Cleanup dark mode overrides
 on:
-  workflow_dispatch:
+  push:
+    branches: [main]
 jobs:
   cleanup:
     runs-on: ubuntu-latest
