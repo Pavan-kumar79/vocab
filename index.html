@@ -52,86 +52,8 @@
             background: #475569;
         }
     </style>
-<style id="monochrome-palette">
-/* Monochrome palette: black / grey / white only */
-body { background:#0b0b0b !important; color:#f5f5f5 !important; }
-[class~="bg-white"],[class~="bg-slate-50"],[class~="bg-slate-100"] { background:#151515 !important; }
-[class~="dark:bg-slate-800"],[class~="dark:bg-slate-900"] { background:#151515 !important; }
-[class~="bg-slate-800"],[class~="bg-slate-900"] { background:#111 !important; }
-[class~="bg-slate-700"],[class~="bg-slate-600"] { background:#222 !important; }
-[class~="bg-slate-200"],[class~="bg-slate-300"] { background:#d0d0d0 !important; }
-[class~="border-slate-200"],[class~="border-slate-300"],[class~="border-slate-700"] { border-color:#3a3a3a !important; }
-[class~="dark:border-slate-700"],[class~="dark:border-slate-600"] { border-color:#3a3a3a !important; }
-[class*="bg-gradient-to-"] { background:#1a1a1a !important; }
-[class*="text-brand-"],[class*="text-indigo-"],[class*="text-purple-"],[class*="text-sky-"],[class*="text-blue-"], [class*="text-emerald-"],[class*="text-rose-"],[class*="text-amber-"],[class*="text-green-"],[class*="text-red-"],[class*="text-violet-"],[class*="text-cyan-"] { color:#d6d6d6 !important; }
-[class~="text-slate-950"],[class~="text-slate-900"] { color:#111 !important; }
-[class~="text-slate-800"],[class~="text-slate-700"],[class~="text-slate-600"],[class~="text-slate-500"],[class~="text-slate-400"],[class~="text-slate-300"],[class~="text-slate-200"] { color:#cfcfcf !important; }
-[class~="dark:text-white"],[class~="text-white"] { color:#fff !important; }
-[class~="bg-clip-text"] { background-image:none !important; color:#fff !important; }
-.custom-scrollbar::-webkit-scrollbar-track { background:#171717 !important; }
-.custom-scrollbar::-webkit-scrollbar-thumb { background:#555 !important; }
-</style>
-<style id="semantic-color-accents">
-/* Small semantic accents only: keep the monochrome UI, restore meaningful status colors. */
-#daily-streak-button i { color:#f59e0b !important; }
-#nav-troublesome i { color:#f59e0b !important; }
-#mobile-menu #nav-troublesome i { color:#f59e0b !important; }
-</style>
-<style id="metric-semantic-colors">
-/* Small semantic accents for home progress metrics. */
-.metric-coverage-accent { color:#f59e0b !important; }
-.metric-coverage-accent.metric-progress-fill { background:#f59e0b !important; }
-.metric-accuracy-accent { color:#22c55e !important; }
-.metric-accuracy-accent.metric-progress-fill { background:#22c55e !important; }
-</style>
-<script id="metric-semantic-color-logic">
-(function(){
-  function applyMetricColors(){
-    const home=document.getElementById('view-home');
-    if(!home) return;
-    const labels=[...home.querySelectorAll('h1,h2,h3,h4,h5,h6,p,span,div')];
-    for(const label of labels){
-      const text=(label.textContent||'').trim();
-      if(text!=='Bank Coverage' && text!=='Overall Accuracy') continue;
-      let card=label.closest('.border');
-      if(!card) card=label.parentElement?.parentElement;
-      if(!card) continue;
-      const coverage=text==='Bank Coverage';
-      const accent=coverage?'metric-coverage-accent':'metric-accuracy-accent';
-      card.classList.add(accent);
-      for(const el of card.querySelectorAll('*')){
-        const t=(el.textContent||'').trim();
-        if(/^\d+(?:\.\d+)?%$/.test(t)) el.classList.add(accent);
-        const style=el.getAttribute('style')||'';
-        if(/width\s*:/i.test(style)) el.classList.add(accent,'metric-progress-fill');
-      }
-    }
-  }
-  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',applyMetricColors);
-  else applyMetricColors();
-  setTimeout(applyMetricColors,500);
-})();
-</script>
-<style id="ui-visibility-fix-v1">
-/* Final visibility fix: keep the existing layout, make interactive controls and progress bars clearly visible. */
-button, .nav-btn { color:#f5f5f5 !important; }
-button:hover, button:focus, button:focus-visible, .nav-btn:hover, .nav-btn:focus, .nav-btn:focus-visible { color:#fff !important; background:#2f2f2f !important; }
-[class*="bg-amber-400"], [class*="bg-amber-500"] { background:#f59e0b !important; color:#111 !important; }
-[class*="hover:bg-amber-300"]:hover, [class*="hover:bg-amber-400"]:hover, [class*="hover:bg-amber-500"]:hover { background:#fbbf24 !important; color:#111 !important; }
-[class*="bg-brand-"], [class*="bg-sky-"], [class*="bg-blue-500"], [class*="bg-blue-600"] { background:#0284c7 !important; color:#fff !important; }
-[class*="hover:bg-brand-"]:hover, [class*="hover:bg-sky-"]:hover, [class*="hover:bg-blue-"]:hover { background:#0369a1 !important; color:#fff !important; }
-[class*="bg-emerald-"], [class*="bg-green-"] { background:#16a34a !important; color:#fff !important; }
-[class*="bg-red-"], [class*="bg-rose-"] { background:#dc2626 !important; color:#fff !important; }
-[class*="bg-purple-"], [class*="bg-indigo-"] { background:#4f46e5 !important; color:#fff !important; }
-/* Progress bars: override the broad monochrome background rule only for actual filled bars. */
-#coverage-bar, #accuracy-bar, [id*="progress-bar"] { background:#f59e0b !important; opacity:1 !important; }
-#accuracy-bar { background:#22c55e !important; }
-[class*="progress"] [style*="width"], [style*="width: 0%"], [style*="width:0%"] { background:#777 !important; opacity:1 !important; }
-/* Quiz progress and selected/correct states should never become black. */
-[class*="border-brand-"], [class*="border-sky-"], [class*="border-emerald-"], [class*="border-green-"] { border-color:#38bdf8 !important; }
-</style>
-<style id="main-home-button-fix-v2">#view-home button[onclick*="startQuickQuiz"]{background:#f59e0b!important;color:#111!important;opacity:1!important}#view-home button[onclick*="startQuickQuiz"] i{color:#111!important}#view-home button[onclick*="startQuickQuiz"]:hover,#view-home button[onclick*="startQuickQuiz"]:focus,#view-home button[onclick*="startQuickQuiz"]:focus-visible{background:#fbbf24!important;color:#111!important}</style><style id="page-background-black-fix">html, body { background:#0b0b0b !important; }</style></head>
-<body class="h-full text-slate-800 dark:text-slate-100 dark:bg-slate-900 font-sans flex flex-col antialiased selection:bg-brand-500 selection:text-white" style="background:#000 !important;;background:#000 !important;">
+</head>
+<body class="h-full text-slate-800 dark:text-slate-100 dark:bg-slate-900 font-sans flex flex-col antialiased selection:bg-brand-500 selection:text-white">
 
     <!-- APP HEADER -->
     <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm transition-colors">
